@@ -3,6 +3,7 @@ package org.example.quid.conversation.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.quid.agent.entity.Agent;
 import org.example.quid.channel.entity.Channel;
 import org.example.quid.conversation.enums.ConversationStatus;
 import org.example.quid.customer.entity.Customer;
@@ -38,10 +39,15 @@ public class Conversation {
     @JoinColumn(name = "workspace_id", nullable = false)
     private Workspace workspace;
 
-    // null = AI is handling; set when an agent takes over
+    // null = AI is handling; set when a human agent takes over
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assigned_agent_id")
     private User assignedAgent;
+
+    // which AI agent handled this conversation
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ai_agent_id")
+    private Agent aiAgent;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

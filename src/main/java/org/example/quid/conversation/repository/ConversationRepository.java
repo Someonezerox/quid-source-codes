@@ -25,7 +25,12 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
 
     Optional<Conversation> findTopByCustomerAndStatusNotOrderByCreatedAtDesc(Customer customer, ConversationStatus status);
 
-    @EntityGraph(attributePaths = {"customer", "channel", "workspace"})
+    @EntityGraph(attributePaths = {"customer", "channel", "channel.assignedAgent", "workspace"})
     @Query("SELECT c FROM Conversation c WHERE c.id = :id")
     Optional<Conversation> findByIdWithDetails(@Param("id") Long id);
+
+    long countByAiAgent_Id(Long agentId);
+
+    @Query("SELECT AVG(c.confidenceScore) FROM Conversation c WHERE c.aiAgent.id = :agentId AND c.confidenceScore IS NOT NULL")
+    Double avgConfidenceByAiAgentId(@Param("agentId") Long agentId);
 }

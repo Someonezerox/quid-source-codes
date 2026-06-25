@@ -16,8 +16,8 @@ import java.util.List;
 @Component
 public class ClaudeClient {
 
-    private static final String SYSTEM_PROMPT = """
-            You are a customer support AI. Answer using the knowledge base below.
+    private static final String PROMPT_SUFFIX = """
+
             Respond ONLY with valid JSON in exactly this format (no markdown, no extra text):
             {"reply": "your response", "confidence": 0.95}
             confidence is 0.0–1.0: how certain you are you can handle this query well.
@@ -41,15 +41,18 @@ public class ClaudeClient {
                 .build();
     }
 
-    public AiResponse chat(String knowledgeContext, List<Message> history) {
+    public AiResponse chat(String agentPersona, String knowledgeContext, List<Message> history) {
         var messages = history.stream()
                 .map(m -> new Msg(toClaudeRole(m.getRole()), m.getContent()))
                 .toList();
 
+        String systemPrompt = agentPersona + PROMPT_SUFFIX.formatted(
+                knowledgeContext.isBlank() ? "No specific knowledge provided." : knowledgeContext);
+
         var request = new Request(
                 props.anthropicModel(),
                 1024,
-                SYSTEM_PROMPT.formatted(knowledgeContext.isBlank() ? "No specific knowledge provided." : knowledgeContext),
+                systemPrompt,
                 messages
         );
 

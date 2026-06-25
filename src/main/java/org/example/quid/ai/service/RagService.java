@@ -1,15 +1,13 @@
 package org.example.quid.ai.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.quid.agent.entity.Agent;
 import org.example.quid.ai.client.EmbeddingClient;
 import org.example.quid.ai.properties.AiProperties;
-import org.example.quid.knowledge.entity.KnowledgeEntry;
 import org.example.quid.knowledge.repository.KnowledgeEntryRepository;
-import org.example.quid.workspace.entity.Workspace;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -23,12 +21,12 @@ public class RagService {
     private final KnowledgeEntryRepository entryRepository;
     private final AiProperties props;
 
-    public String buildContext(String query, Workspace workspace) {
+    public String buildContext(String query, Agent agent) {
         float[] embedding = embeddingClient.embed(query);
         if (embedding.length == 0) return "";
 
         List<Long> ids = entryRepository.findTopKByEmbeddingSimilarity(
-                workspace.getId(), toVectorString(embedding), props.ragTopK());
+                agent.getId(), toVectorString(embedding), props.ragTopK());
 
         if (ids.isEmpty()) return "";
 

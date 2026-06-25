@@ -1,5 +1,6 @@
 package org.example.quid.channel.repository;
 
+import org.example.quid.agent.entity.Agent;
 import org.example.quid.channel.entity.Channel;
 import org.example.quid.workspace.entity.Workspace;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,4 +13,5 @@ public interface ChannelRepository extends JpaRepository<Channel, Long> {
     Optional<Channel> findByIdAndWorkspace(Long id, Workspace workspace);
     Optional<Channel> findByBotToken(String botToken);
     boolean existsByBotTokenAndWorkspace(String botToken, Workspace workspace);
+    List<Channel> findAllByAssignedAgent(Agent agent);
 }

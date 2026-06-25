@@ -2,6 +2,7 @@ package org.example.quid.ai.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.quid.agent.entity.Agent;
 import org.example.quid.ai.client.ClaudeClient;
 import org.example.quid.ai.dto.AiResponse;
 import org.example.quid.ai.properties.AiProperties;
@@ -38,6 +39,9 @@ public class AiRoutingService {
         Conversation conv = conversationRepository.findByIdWithDetails(conversationId).orElse(null);
         if (conv == null || conv.getStatus() != ConversationStatus.AI_HANDLING) return;
 
+        Agent agent = conv.getChannel().getAssignedAgent();
+        if (agent == null || !agent.isActive()) return;
+
         try {
             List<Message> history = messageRepository.findAllByConversationOrderByCreatedAtAsc(conv);
             if (history.isEmpty()) return;
@@ -47,12 +51,13 @@ public class AiRoutingService {
                     : history;
 
             String lastMessage = history.get(history.size() - 1).getContent();
-            String context = ragService.buildContext(lastMessage, conv.getWorkspace());
+            String context = ragService.buildContext(lastMessage, agent);
 
-            AiResponse aiResponse = claudeClient.chat(context, window);
+            AiResponse aiResponse = claudeClient.chat(agent.getSystemPrompt(), context, window);
             conv.setConfidenceScore(aiResponse.confidence());
+            conv.setAiAgent(agent);
 
-            if (aiResponse.confidence() >= conv.getWorkspace().getConfidenceThreshold()) {
+            if (aiResponse.confidence() >= agent.getConfidenceThreshold()) {
                 conversationService.addMessage(conv, aiResponse.reply(), MessageRole.AI, null);
                 telegramBotClient.sendMessage(
                         conv.getChannel().getBotToken(),

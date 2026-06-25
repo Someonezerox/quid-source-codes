@@ -11,9 +11,12 @@ public record ChannelResponse(
         ChannelType type,
         String webhookUrl,
         boolean active,
+        Long assignedAgentId,
         Instant createdAt
 ) {
     public static ChannelResponse from(Channel c) {
-        return new ChannelResponse(c.getId(), c.getName(), c.getType(), c.getWebhookUrl(), c.isActive(), c.getCreatedAt());
+        return new ChannelResponse(c.getId(), c.getName(), c.getType(), c.getWebhookUrl(), c.isActive(),
+                c.getAssignedAgent() != null ? c.getAssignedAgent().getId() : null,
+                c.getCreatedAt());
     }
 }

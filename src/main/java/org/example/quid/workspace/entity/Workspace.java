@@ -20,9 +20,6 @@ public class Workspace {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, columnDefinition = "DOUBLE PRECISION DEFAULT 0.75")
-    private double confidenceThreshold = 0.75;
-
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private Instant createdAt;

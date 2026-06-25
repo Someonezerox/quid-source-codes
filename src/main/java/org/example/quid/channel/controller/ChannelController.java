@@ -7,7 +7,6 @@ import org.example.quid.channel.dto.ChannelResponse;
 import org.example.quid.channel.service.ChannelService;
 import org.example.quid.user.entity.User;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,9 +20,10 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @PostMapping
-    public ResponseEntity<ChannelResponse> create(@Valid @RequestBody ChannelRequest request,
-                                                  @AuthenticationPrincipal User user) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(channelService.create(request, user.getWorkspace()));
+    @ResponseStatus(HttpStatus.CREATED)
+    public ChannelResponse create(@Valid @RequestBody ChannelRequest request,
+                                  @AuthenticationPrincipal User user) {
+        return channelService.create(request, user.getWorkspace());
     }
 
     @GetMapping
@@ -44,8 +44,8 @@ public class ChannelController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deactivate(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deactivate(@PathVariable Long id, @AuthenticationPrincipal User user) {
         channelService.deactivate(id, user.getWorkspace());
-        return ResponseEntity.noContent().build();
     }
 }

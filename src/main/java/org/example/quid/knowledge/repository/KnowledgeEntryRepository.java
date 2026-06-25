@@ -11,16 +11,16 @@ import java.util.Optional;
 
 public interface KnowledgeEntryRepository extends JpaRepository<KnowledgeEntry, Long> {
     List<KnowledgeEntry> findAllByKnowledgeBase(KnowledgeBase knowledgeBase);
-    Optional<KnowledgeEntry> findByIdAndKnowledgeBase_Workspace_Id(Long id, Long workspaceId);
+    Optional<KnowledgeEntry> findByIdAndKnowledgeBase_Agent_Workspace_Id(Long id, Long workspaceId);
 
     @Query(value = """
             SELECT ke.id FROM knowledge_entries ke
             JOIN knowledge_bases kb ON ke.knowledge_base_id = kb.id
-            WHERE kb.workspace_id = :workspaceId AND ke.embedding IS NOT NULL
+            WHERE kb.agent_id = :agentId AND ke.embedding IS NOT NULL
             ORDER BY ke.embedding <=> CAST(:queryVector AS vector)
             LIMIT :k
             """, nativeQuery = true)
-    List<Long> findTopKByEmbeddingSimilarity(@Param("workspaceId") Long workspaceId,
+    List<Long> findTopKByEmbeddingSimilarity(@Param("agentId") Long agentId,
                                              @Param("queryVector") String queryVector,
                                              @Param("k") int k);
 }

@@ -3,7 +3,7 @@ package org.example.quid.knowledge.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.example.quid.workspace.entity.Workspace;
+import org.example.quid.agent.entity.Agent;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
@@ -22,8 +22,8 @@ public class KnowledgeBase {
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workspace_id", nullable = false)
-    private Workspace workspace;
+    @JoinColumn(name = "agent_id", nullable = false)
+    private Agent agent;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

@@ -16,6 +16,10 @@ QUID is an AI-first omni-channel customer communication platform. Aggregates Tel
 * **Data Privacy:** Every domain entity is scoped to a `Workspace`. Never query across workspaces.
 * **Lombok:** `@RequiredArgsConstructor` for DI. Never `@Data` on `@Entity` — use `@Getter` + `@Setter`.
 * **Null safety:** Add `@NullMarked` only to classes that implement/extend Spring Security's `@NullMarked` interfaces (`UserDetails`, `UserDetailsService`, `OncePerRequestFilter`). Do NOT use package-info.java files.
+* **Controller response style:** Never use `ResponseEntity`. Always use `@ResponseStatus` + bare return type:
+  - POST that creates → `@ResponseStatus(HttpStatus.CREATED)` + return `T`
+  - DELETE / no-body action → `@ResponseStatus(HttpStatus.NO_CONTENT)` + `void`
+  - GET / PUT → bare return `T` / `List<T>` / `Page<T>` (200 is the default)
 
 ## What Is Already Built (do NOT re-implement)
 * **Auth** — register (creates workspace + ADMIN user), login, refresh, logout via `/api/auth/**`

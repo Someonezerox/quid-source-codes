@@ -1,20 +1,18 @@
-package org.example.quid.channel.entity;
+package org.example.quid.agent.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.example.quid.agent.entity.Agent;
-import org.example.quid.channel.enums.ChannelType;
 import org.example.quid.workspace.entity.Workspace;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 
 @Entity
-@Table(name = "channels")
+@Table(name = "agents", indexes = @Index(columnList = "workspace_id"))
 @Getter
 @Setter
-public class Channel {
+public class Agent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,14 +21,14 @@ public class Channel {
     @Column(nullable = false)
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ChannelType type;
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String systemPrompt;
 
     @Column(nullable = false)
-    private String botToken;
-
-    private String webhookUrl;
+    private double confidenceThreshold = 0.75;
 
     @Column(nullable = false)
     private boolean active = true;
@@ -38,10 +36,6 @@ public class Channel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspace_id", nullable = false)
     private Workspace workspace;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assigned_agent_id")
-    private Agent assignedAgent;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

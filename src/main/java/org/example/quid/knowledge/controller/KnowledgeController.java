@@ -29,8 +29,9 @@ public class KnowledgeController {
     }
 
     @GetMapping("/bases")
-    public List<KnowledgeBaseResponse> listBases(@AuthenticationPrincipal User user) {
-        return knowledgeService.listBases(user.getWorkspace());
+    public List<KnowledgeBaseResponse> listBases(@RequestParam Long agentId,
+                                                  @AuthenticationPrincipal User user) {
+        return knowledgeService.listBases(agentId, user.getWorkspace());
     }
 
     @DeleteMapping("/bases/{id}")

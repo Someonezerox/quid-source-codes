@@ -2,6 +2,8 @@ package org.example.quid.knowledge.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.quid.agent.entity.Agent;
+import org.example.quid.agent.service.AgentService;
 import org.example.quid.ai.client.EmbeddingClient;
 import org.example.quid.ai.service.RagService;
 import org.example.quid.exception.ResourceNotFoundException;
@@ -30,26 +32,27 @@ public class KnowledgeService {
     private final KnowledgeBaseRepository kbRepository;
     private final KnowledgeEntryRepository entryRepository;
     private final EmbeddingClient embeddingClient;
+    private final AgentService agentService;
     private final JdbcTemplate jdbc;
 
     // --- Knowledge Base ---
 
     public KnowledgeBaseResponse createBase(KnowledgeBaseRequest request, Workspace workspace) {
+        Agent agent = agentService.getOrThrow(request.agentId(), workspace);
         KnowledgeBase kb = new KnowledgeBase();
         kb.setName(request.name());
-        kb.setWorkspace(workspace);
+        kb.setAgent(agent);
         return KnowledgeBaseResponse.from(kbRepository.save(kb));
     }
 
     @Transactional(readOnly = true)
-    public List<KnowledgeBaseResponse> listBases(Workspace workspace) {
-        return kbRepository.findAllByWorkspace(workspace).stream().map(KnowledgeBaseResponse::from).toList();
+    public List<KnowledgeBaseResponse> listBases(Long agentId, Workspace workspace) {
+        Agent agent = agentService.getOrThrow(agentId, workspace);
+        return kbRepository.findAllByAgent(agent).stream().map(KnowledgeBaseResponse::from).toList();
     }
 
     public void deleteBase(Long id, Workspace workspace) {
-        KnowledgeBase kb = kbRepository.findById(id)
-                .filter(b -> b.getWorkspace().getId().equals(workspace.getId()))
-                .orElseThrow(() -> new ResourceNotFoundException("Knowledge base not found"));
+        KnowledgeBase kb = getKbOrThrow(id, workspace);
         kbRepository.delete(kb);
     }
 
@@ -76,7 +79,7 @@ public class KnowledgeService {
 
     public KnowledgeEntryResponse updateEntry(Long kbId, Long entryId, KnowledgeEntryRequest request, Workspace workspace) {
         getKbOrThrow(kbId, workspace);
-        KnowledgeEntry entry = entryRepository.findByIdAndKnowledgeBase_Workspace_Id(entryId, workspace.getId())
+        KnowledgeEntry entry = entryRepository.findByIdAndKnowledgeBase_Agent_Workspace_Id(entryId, workspace.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Entry not found"));
         entry.setTitle(request.title());
         entry.setContent(request.content());
@@ -86,7 +89,7 @@ public class KnowledgeService {
 
     public void deleteEntry(Long kbId, Long entryId, Workspace workspace) {
         getKbOrThrow(kbId, workspace);
-        KnowledgeEntry entry = entryRepository.findByIdAndKnowledgeBase_Workspace_Id(entryId, workspace.getId())
+        KnowledgeEntry entry = entryRepository.findByIdAndKnowledgeBase_Agent_Workspace_Id(entryId, workspace.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Entry not found"));
         entryRepository.delete(entry);
     }
@@ -101,8 +104,7 @@ public class KnowledgeService {
     }
 
     private KnowledgeBase getKbOrThrow(Long id, Workspace workspace) {
-        return kbRepository.findById(id)
-                .filter(kb -> kb.getWorkspace().getId().equals(workspace.getId()))
+        return kbRepository.findByIdAndAgent_Workspace_Id(id, workspace.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Knowledge base not found"));
     }
 }
