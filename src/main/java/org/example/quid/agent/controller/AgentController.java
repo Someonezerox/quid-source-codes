@@ -2,7 +2,6 @@ package org.example.quid.agent.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.quid.agent.dto.AgentChannelRequest;
 import org.example.quid.agent.dto.AgentDetailResponse;
 import org.example.quid.agent.dto.AgentRequest;
 import org.example.quid.agent.dto.AgentResponse;

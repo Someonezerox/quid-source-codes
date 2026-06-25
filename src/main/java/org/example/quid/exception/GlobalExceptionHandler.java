@@ -1,7 +1,5 @@
 package org.example.quid.exception;
 
-import org.example.quid.exception.ConflictException;
-import org.example.quid.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

@@ -13,6 +13,7 @@ import org.example.quid.knowledge.dto.KnowledgeEntryRequest;
 import org.example.quid.knowledge.dto.KnowledgeEntryResponse;
 import org.example.quid.knowledge.entity.KnowledgeBase;
 import org.example.quid.knowledge.entity.KnowledgeEntry;
+import org.example.quid.knowledge.mapper.KnowledgeMapper;
 import org.example.quid.knowledge.repository.KnowledgeBaseRepository;
 import org.example.quid.knowledge.repository.KnowledgeEntryRepository;
 import org.example.quid.workspace.entity.Workspace;
@@ -33,47 +34,41 @@ public class KnowledgeService {
     private final KnowledgeEntryRepository entryRepository;
     private final EmbeddingClient embeddingClient;
     private final AgentService agentService;
+    private final KnowledgeMapper knowledgeMapper;
     private final JdbcTemplate jdbc;
 
     // --- Knowledge Base ---
 
     public KnowledgeBaseResponse createBase(KnowledgeBaseRequest request, Workspace workspace) {
         Agent agent = agentService.getOrThrow(request.agentId(), workspace);
-        KnowledgeBase kb = new KnowledgeBase();
-        kb.setName(request.name());
-        kb.setAgent(agent);
-        return KnowledgeBaseResponse.from(kbRepository.save(kb));
+        return knowledgeMapper.toBaseResponse(kbRepository.save(knowledgeMapper.toBaseEntity(request.name(), agent)));
     }
 
     @Transactional(readOnly = true)
     public List<KnowledgeBaseResponse> listBases(Long agentId, Workspace workspace) {
         Agent agent = agentService.getOrThrow(agentId, workspace);
-        return kbRepository.findAllByAgent(agent).stream().map(KnowledgeBaseResponse::from).toList();
+        return kbRepository.findAllByAgent(agent).stream()
+                .map(knowledgeMapper::toBaseResponse)
+                .toList();
     }
 
     public void deleteBase(Long id, Workspace workspace) {
-        KnowledgeBase kb = getKbOrThrow(id, workspace);
-        kbRepository.delete(kb);
+        kbRepository.delete(getKbOrThrow(id, workspace));
     }
 
     // --- Knowledge Entry ---
 
     public KnowledgeEntryResponse createEntry(Long kbId, KnowledgeEntryRequest request, Workspace workspace) {
         KnowledgeBase kb = getKbOrThrow(kbId, workspace);
-        KnowledgeEntry entry = new KnowledgeEntry();
-        entry.setKnowledgeBase(kb);
-        entry.setTitle(request.title());
-        entry.setContent(request.content());
-        KnowledgeEntry saved = entryRepository.save(entry);
+        KnowledgeEntry saved = entryRepository.save(knowledgeMapper.toEntryEntity(request, kb));
         embedAsync(saved.getId(), request.title() + "\n" + request.content());
-        return KnowledgeEntryResponse.from(saved, false);
+        return knowledgeMapper.toEntryResponse(saved, false);
     }
 
     @Transactional(readOnly = true)
     public List<KnowledgeEntryResponse> listEntries(Long kbId, Workspace workspace) {
-        KnowledgeBase kb = getKbOrThrow(kbId, workspace);
-        return entryRepository.findAllByKnowledgeBase(kb).stream()
-                .map(e -> KnowledgeEntryResponse.from(e, false))
+        return entryRepository.findAllByKnowledgeBase(getKbOrThrow(kbId, workspace)).stream()
+                .map(e -> knowledgeMapper.toEntryResponse(e, false))
                 .toList();
     }
 
@@ -81,10 +76,9 @@ public class KnowledgeService {
         getKbOrThrow(kbId, workspace);
         KnowledgeEntry entry = entryRepository.findByIdAndKnowledgeBase_Agent_Workspace_Id(entryId, workspace.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Entry not found"));
-        entry.setTitle(request.title());
-        entry.setContent(request.content());
+        knowledgeMapper.update(entry, request);
         embedAsync(entry.getId(), request.title() + "\n" + request.content());
-        return KnowledgeEntryResponse.from(entry, false);
+        return knowledgeMapper.toEntryResponse(entry, false);
     }
 
     public void deleteEntry(Long kbId, Long entryId, Workspace workspace) {

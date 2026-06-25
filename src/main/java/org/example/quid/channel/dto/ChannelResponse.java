@@ -1,6 +1,5 @@
 package org.example.quid.channel.dto;
 
-import org.example.quid.channel.entity.Channel;
 import org.example.quid.channel.enums.ChannelType;
 
 import java.time.Instant;
@@ -13,10 +12,4 @@ public record ChannelResponse(
         boolean active,
         Long assignedAgentId,
         Instant createdAt
-) {
-    public static ChannelResponse from(Channel c) {
-        return new ChannelResponse(c.getId(), c.getName(), c.getType(), c.getWebhookUrl(), c.isActive(),
-                c.getAssignedAgent() != null ? c.getAssignedAgent().getId() : null,
-                c.getCreatedAt());
-    }
-}
+) {}

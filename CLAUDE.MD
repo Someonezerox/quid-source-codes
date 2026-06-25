@@ -20,6 +20,18 @@ QUID is an AI-first omni-channel customer communication platform. Aggregates Tel
   - POST that creates → `@ResponseStatus(HttpStatus.CREATED)` + return `T`
   - DELETE / no-body action → `@ResponseStatus(HttpStatus.NO_CONTENT)` + `void`
   - GET / PUT → bare return `T` / `List<T>` / `Page<T>` (200 is the default)
+* **Mapper pattern:** Every feature that has DTOs must have a `{feature}/mapper/{Feature}Mapper.java`. See `agent/mapper/AgentMapper.java` as the reference implementation.
+  - **DTOs are pure data records** — no `from()`, no `toEntity()`, no logic of any kind inside them
+  - **All mapping lives in the mapper** — the mapper is a `@Component` injected into the service
+  - **Four method types to implement** (only the ones needed for that feature):
+    ```
+    toResponse(Entity, ...)           → response DTO        (used in GET list + GET single)
+    toDetailResponse(Entity, ...)     → richer detail DTO   (used in GET /{id} only)
+    toEntity(Request, Workspace)      → new Entity          (used in POST / create)
+    update(Entity, Request)           → void                (mutates entity in place, used in PUT)
+    ```
+  - **Service calls mapper, not the DTO**: `agentMapper.toResponse(agent, ...)` not `AgentResponse.from(agent, ...)`
+  - **Never put cross-feature logic in a mapper** — if building a response requires repository calls (e.g. stats), do that in the service and pass the results as parameters to the mapper method
 
 ## What Is Already Built (do NOT re-implement)
 * **Auth** — register (creates workspace + ADMIN user), login, refresh, logout via `/api/auth/**`
