@@ -12,20 +12,23 @@ import java.util.List;
 public class EmbeddingClient {
 
     private final RestClient http;
+    private final AiProperties props;
 
     public EmbeddingClient(AiProperties props) {
+        this.props = props;
         this.http = RestClient.builder()
-                .baseUrl("https://api.openai.com")
-                .defaultHeader("Authorization", "Bearer " + props.openaiApiKey())
-                .defaultHeader("content-type", "application/json")
+                .baseUrl("https://openrouter.ai/api/v1")
+                .defaultHeader("Authorization", "Bearer " + props.openRouterApiKey())
+                .defaultHeader("Content-Type", "application/json")
+                .defaultHeader("X-Title", "QUID")
                 .build();
     }
 
     public float[] embed(String text) {
         try {
             var response = http.post()
-                    .uri("/v1/embeddings")
-                    .body(new Request("text-embedding-3-small", text))
+                    .uri("/embeddings")
+                    .body(new Request(props.embeddingModel(), text))
                     .retrieve()
                     .body(Response.class);
 

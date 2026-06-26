@@ -3,7 +3,7 @@ package org.example.quid.ai.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.quid.agent.entity.Agent;
-import org.example.quid.ai.client.ClaudeClient;
+import org.example.quid.ai.client.ChatClient;
 import org.example.quid.ai.dto.AiResponse;
 import org.example.quid.ai.properties.AiProperties;
 import org.example.quid.conversation.entity.Conversation;
@@ -29,7 +29,7 @@ public class AiRoutingService {
     private final MessageRepository messageRepository;
     private final ConversationService conversationService;
     private final RagService ragService;
-    private final ClaudeClient claudeClient;
+    private final ChatClient chatClient;
     private final TelegramBotClient telegramBotClient;
     private final AiProperties props;
 
@@ -53,7 +53,7 @@ public class AiRoutingService {
             String lastMessage = history.get(history.size() - 1).getContent();
             String context = ragService.buildContext(lastMessage, agent);
 
-            AiResponse aiResponse = claudeClient.chat(agent.getSystemPrompt(), context, window);
+            AiResponse aiResponse = chatClient.chat(agent.getSystemPrompt(), context, window);
             conv.setConfidenceScore(aiResponse.confidence());
             conv.setAiAgent(agent);
 
