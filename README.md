@@ -28,8 +28,8 @@ Customer sends Telegram message
 | Language | Java 21 (Virtual Threads) |
 | Framework | Spring Boot 4.x, Spring Security, Spring Data JPA |
 | Database | PostgreSQL + pgvector (vector similarity search) |
-| AI | Anthropic Claude (`claude-haiku-4-5-20251001`) |
-| Embeddings | OpenAI `text-embedding-3-small` (1536 dims) |
+| AI | OpenRouter — `anthropic/claude-haiku-4-5-20251001` (chat) |
+| Embeddings | OpenRouter — `openai/text-embedding-3-small` (1536 dims) |
 | Auth | JWT (access + refresh tokens, BCrypt) |
 | Utilities | Lombok |
 
@@ -39,8 +39,7 @@ Customer sends Telegram message
 
 - Java 21+
 - PostgreSQL 15+ with the `pgvector` extension
-- An Anthropic API key
-- An OpenAI API key (for embeddings)
+- An OpenRouter API key (covers both chat and embeddings)
 
 ### PostgreSQL setup
 
@@ -56,17 +55,16 @@ CREATE DATABASE quid;
 All sensitive values are read from environment variables. Export before running:
 
 ```bash
-export ANTHROPIC_API_KEY=sk-ant-...
-export OPENAI_API_KEY=sk-...
+export OPENROUTER_API_KEY=sk-or-...
 export JWT_SECRET=your-32-plus-char-random-secret
 ```
 
 | Property | Env var | Default | Description |
 |---|---|---|---|
-| `ai.anthropic-api-key` | `ANTHROPIC_API_KEY` | — | Claude API key |
-| `ai.anthropic-model` | — | `claude-haiku-4-5-20251001` | Model used for AI replies |
-| `ai.openai-api-key` | `OPENAI_API_KEY` | — | OpenAI key for embeddings |
-| `ai.max-history-messages` | — | `10` | Message window sent to Claude |
+| `ai.open-router-api-key` | `OPENROUTER_API_KEY` | — | OpenRouter API key (chat + embeddings) |
+| `ai.chat-model` | — | `anthropic/claude-haiku-4-5-20251001` | Model used for AI replies |
+| `ai.embedding-model` | — | `openai/text-embedding-3-small` | Model used for RAG embeddings |
+| `ai.max-history-messages` | — | `10` | Message window sent to model |
 | `ai.rag-top-k` | — | `5` | Top-K KB chunks injected into prompt |
 | `app.jwt.secret` | `JWT_SECRET` | insecure default | Sign secret — always override in prod |
 | `app.jwt.access-token-expiry` | — | `900000` ms (15 min) | Access token lifetime |
@@ -99,7 +97,7 @@ src/main/java/org/example/quid/
 │   ├── mapper/         AgentMapper — all entity ↔ dto conversion
 │   ├── repository/
 │   └── service/
-├── ai/                 Claude client, OpenAI embedding client, RAG service, routing
+├── ai/                 OpenRouter chat + embedding clients, RAG service, routing
 ├── auth/               Register, login, refresh, logout — JWT issuance
 ├── channel/            Telegram channel CRUD — holds bot token, assigned AI agent
 ├── conversation/       Conversation + Message entities, Inbox API
@@ -270,8 +268,7 @@ confidence >= threshold   confidence < threshold
 psql -c "CREATE DATABASE quid;"
 
 # 2. Set environment variables
-export ANTHROPIC_API_KEY=sk-ant-...
-export OPENAI_API_KEY=sk-...
+export OPENROUTER_API_KEY=sk-or-...
 export JWT_SECRET=some-random-32-char-secret
 
 # 3. Run
