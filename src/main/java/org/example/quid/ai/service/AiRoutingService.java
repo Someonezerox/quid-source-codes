@@ -13,12 +13,17 @@ import org.example.quid.conversation.enums.MessageRole;
 import org.example.quid.conversation.repository.ConversationRepository;
 import org.example.quid.conversation.repository.MessageRepository;
 import org.example.quid.conversation.service.ConversationService;
+import org.example.quid.customer.entity.Customer;
+import org.example.quid.notification.NotificationService;
 import org.example.quid.telegram.client.TelegramBotClient;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -31,6 +36,7 @@ public class AiRoutingService {
     private final RagService ragService;
     private final ChatClient chatClient;
     private final TelegramBotClient telegramBotClient;
+    private final NotificationService notificationService;
     private final AiProperties props;
 
     @Async
@@ -67,10 +73,23 @@ public class AiRoutingService {
             } else {
                 conv.setStatus(ConversationStatus.NEEDS_HUMAN);
                 log.info("Conversation {} routed to human (confidence={})", conversationId, aiResponse.confidence());
+                notificationService.emit(conv.getWorkspace().getId(), "needs_human", customerPayload(conv));
             }
         } catch (Exception e) {
             log.error("AI routing failed for conversation {}, escalating to human", conversationId, e);
             conv.setStatus(ConversationStatus.NEEDS_HUMAN);
+            notificationService.emit(conv.getWorkspace().getId(), "needs_human", customerPayload(conv));
         }
+    }
+
+    private static Map<String, Object> customerPayload(Conversation conv) {
+        Customer c = conv.getCustomer();
+        String name = java.util.stream.Stream.of(c.getFirstName(), c.getLastName())
+                .filter(Objects::nonNull).collect(Collectors.joining(" "));
+        return Map.of(
+                "conversationId", conv.getId(),
+                "customerId", c.getId(),
+                "customerName", name.isBlank() ? Objects.toString(c.getUsername(), "Unknown") : name
+        );
     }
 }
