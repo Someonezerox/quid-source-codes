@@ -11,6 +11,7 @@ import org.example.quid.conversation.repository.ConversationRepository;
 import org.example.quid.conversation.repository.MessageRepository;
 import org.example.quid.customer.enums.CustomerStatus;
 import org.example.quid.exception.ResourceNotFoundException;
+import org.example.quid.notification.NotificationService;
 import org.example.quid.user.entity.User;
 import org.example.quid.workspace.entity.Workspace;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,7 @@ public class InboxService {
     private final MessageRepository messageRepository;
     private final ConversationService conversationService;
     private final ConversationMapper conversationMapper;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public Page<ConversationSummaryResponse> list(Workspace workspace, ConversationStatus status, Pageable pageable) {
@@ -57,6 +60,8 @@ public class InboxService {
         Conversation conv = getOrThrow(conversationId, workspace);
         conv.setStatus(ConversationStatus.NEEDS_HUMAN);
         conv.setAssignedAgent(agent);
+        notificationService.emit(workspace.getId(), "assigned",
+                Map.of("conversationId", conv.getId(), "agentId", agent.getId()));
     }
 
     public void resolve(Long conversationId, Workspace workspace) {
@@ -67,8 +72,11 @@ public class InboxService {
 
     public MessageResponse sendMessage(Long conversationId, String content, User agent, Workspace workspace) {
         Conversation conv = getOrThrow(conversationId, workspace);
-        return conversationMapper.toMessageResponse(
+        MessageResponse response = conversationMapper.toMessageResponse(
                 conversationService.addMessage(conv, content, MessageRole.AGENT, null));
+        notificationService.emit(workspace.getId(), "message",
+                Map.of("conversationId", conversationId, "content", content, "role", "AGENT"));
+        return response;
     }
 
     private Conversation getOrThrow(Long id, Workspace workspace) {

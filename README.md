@@ -306,3 +306,4 @@ curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://yourdomain.com/
 |---|---|
 | M7 | Human agent management — invite staff via email, deactivate accounts |
 | M8 | Real-time notifications (SSE) — push `NEEDS_HUMAN` events to connected agents |
+| M9 | Outbound webhooks — subscribe to QUID events, integrate with Zapier / Make / amoCRM / Sheets |

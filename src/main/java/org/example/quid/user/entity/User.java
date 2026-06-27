@@ -37,6 +37,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role = Role.AGENT;
 
+    @Column(nullable = false)
+    private boolean enabled = true;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspace_id")
     private Workspace workspace;
@@ -49,5 +52,10 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return email;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
     }
 }
