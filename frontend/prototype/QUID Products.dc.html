@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+  :root{
+    --card:#141414; --raised:#1E1E1E; --border:#242424;
+    --text:#F5F5F5; --text2:#A1A1A6; --text3:#6B6B70;
+    --canvas:#0A0A0A; --header:rgba(10,10,11,.82);
+    --line:rgba(255,255,255,.05); --hover:rgba(255,255,255,.03); --track:rgba(255,255,255,.07);
+  }
+  .quid-root[data-theme="light"]{
+    --card:#FFFFFF; --raised:#F4F4F5; --border:#E4E4E7;
+    --text:#18181B; --text2:#52525B; --text3:#8E8E93;
+    --canvas:#F7F7F8; --header:rgba(255,255,255,.82);
+    --line:rgba(0,0,0,.07); --hover:rgba(0,0,0,.04); --track:rgba(0,0,0,.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--canvas);font-family:'Manrope',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px;border:3px solid var(--canvas);}
+  ::-webkit-scrollbar-track{background:transparent;}
+  .quid-btn:hover{filter:brightness(1.07);}
+  .quid-seg{border:none;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:600;padding:6px 12px;border-radius:8px;background:transparent;color:var(--text2);display:flex;align-items:center;gap:6px;transition:color .15s, background .15s;}
+  .quid-seg:hover{color:var(--text);}
+  .quid-seg[data-on="true"]{background:var(--border);color:var(--text);font-weight:700;}
+  .quid-ghost:hover{background:var(--border)!important;}
+  .quid-prow:hover{background:var(--hover)!important;}
+  .quid-tab:hover{color:var(--text)!important;}
+  .quid-nav-item{transition:color 0.2s ease, background-color 0.2s ease!important;cursor:pointer;}
+  .quid-nav-item.active{color:var(--accent,#A8E831)!important;background:transparent!important;}
+  .quid-nav-item.inactive{color:var(--text2)!important;background:transparent!important;}
+  .quid-nav-item:hover,.quid-nav-item.inactive:hover{color:var(--text)!important;background:transparent!important;}
+  .avatar-wrap:hover .avatar-menu{opacity:1!important;pointer-events:all!important;transform:translateY(0)!important;}
+  .row-qa{opacity:0;transition:opacity .15s;display:flex;gap:4px;align-items:center;}
+  .quid-prow:hover .row-qa{opacity:1;}
+  .quid-prow:hover .row-dots{opacity:0!important;}
+</style>
+</helmet>
+<div class="quid-root" data-theme="{{ theme }}" style="--accent: {{ accent }}; display:flex; height:100vh; width:100%; overflow:hidden; background:var(--canvas); color:var(--text); font-family:'Manrope',sans-serif;">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside style="width:78px; flex-shrink:0; height:100%; background:var(--card); border-right:1px solid var(--border); display:flex; flex-direction:column; align-items:center; padding:24px 0 20px 0; box-sizing:border-box;">
+
+    <div style="display:flex; flex-direction:column; align-items:center; gap:6px; margin-bottom:32px; line-height:1; text-align:center;">
+      <div style="width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; background-color:var(--accent,#A8E831);">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="#0A0A0A"><path d="M12 2.5a9.5 9.5 0 1 0 6.4 16.53l2.1 2.1a1.2 1.2 0 0 0 1.7-1.7l-2.1-2.1A9.5 9.5 0 0 0 12 2.5Zm0 4a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Z"></path></svg>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:2px; margin-top:2px;">
+        <span style="font-size:12px; font-weight:800; letter-spacing:-.02em; color:var(--text);">QUID</span>
+      </div>
+    </div>
+
+    <nav style="display:flex; flex-direction:column; align-items:center; gap:22px; width:100%;">
+      <a class="quid-nav quid-nav-item inactive" style="display:flex; flex-direction:column; align-items:center; gap:5px; text-decoration:none; width:100%; text-align:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.0304 5.9513C12.0304 4.88247 11.1352 3.86067 9.90188 4.01565C8.51526 4.18989 7.18259 4.68447 6.01205 5.4666C4.5275 6.45855 3.37044 7.86843 2.68717 9.51797C2.00391 11.1675 1.82514 12.9826 2.17346 14.7338C2.52179 16.4849 3.38156 18.0934 4.64407 19.3559C5.90657 20.6184 7.5151 21.4782 9.26624 21.8265C11.0174 22.1749 12.8325 21.9961 14.482 21.3128C16.1316 20.6296 17.5415 19.4725 18.5334 17.988C19.3155 16.8174 19.8101 15.4847 19.9844 14.0981C20.1393 12.8648 19.1175 11.9696 18.0487 11.9696H13.0335C12.4795 11.9696 12.0304 11.5205 12.0304 10.9665V5.9513Z"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M15.1536 2.02043C13.8986 1.83992 13 2.88595 13 3.95207V9.89247C13 10.5041 13.4959 11 14.1075 11L20.0479 11C21.1141 11 22.1601 10.1014 21.9796 8.84637C21.8842 8.18302 21.7061 7.53266 21.4485 6.91073C21.0437 5.93348 20.4504 5.04552 19.7024 4.29757C18.9545 3.54962 18.0665 2.9563 17.0893 2.55151C16.4673 2.2939 15.817 2.11585 15.1536 2.02043Z"></path></svg>
+        <span style="font-size:11px; font-weight:600;">Dashboard</span>
+      </a>
+      <a class="quid-nav quid-nav-item inactive" style="display:flex; flex-direction:column; align-items:center; gap:5px; text-decoration:none; width:100%; text-align:center; position:relative;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.47715 2 2 6.47715 2 12C2 13.8153 2.48451 15.5196 3.33127 16.9883C3.50372 17.2874 3.5333 17.6516 3.38777 17.9647L2.53406 19.8016C2.00986 20.7933 2.72736 22 3.86159 22H12C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM9 9C8.44772 9 8 9.44772 8 10C8 10.5523 8.44772 11 9 11H11C11.5523 11 12 10.5523 12 10C12 9.44772 11.5523 9 11 9H9ZM9 13C8.44772 13 8 13.4477 8 14C8 14.5523 8.44772 15 9 15H15C15.5523 15 16 14.5523 16 14C16 13.4477 15.5523 13 15 13H9Z"></path></svg>
+        <span style="font-size:11px; font-weight:600;">Inbox</span>
+      </a>
+      <a class="quid-nav quid-nav-item active" style="display:flex; flex-direction:column; align-items:center; gap:5px; text-decoration:none; width:100%; text-align:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M6.45925 6C4.02505 6 2.1552 8.15595 2.49945 10.5657L3.51965 17.7071C3.87155 20.1704 5.98115 22 8.4694 22H15.531C18.0193 22 20.1289 20.1704 20.4808 17.7071L21.501 10.5657C21.8452 8.15595 19.9754 6 17.5412 6H6.45925Z"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M9.44722 2.10554C9.9412 2.35253 10.1414 2.9532 9.89444 3.44718L8.10558 7.02489C7.85859 7.51887 7.25792 7.71909 6.76394 7.4721C6.26996 7.22511 6.06974 6.62444 6.31673 6.13046L8.10558 2.55275C8.35257 2.05877 8.95324 1.85855 9.44722 2.10554Z"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M14.5528 2.10552C15.0468 1.85853 15.6474 2.05876 15.8944 2.55273L17.6833 6.13044C17.9303 6.62442 17.73 7.22509 17.2361 7.47208C16.7421 7.71907 16.1414 7.51885 15.8944 7.02487L14.1056 3.44716C13.8586 2.95318 14.0588 2.35251 14.5528 2.10552Z"></path></svg>
+        <span style="font-size:11px; font-weight:600;">Products</span>
+      </a>
+      <a class="quid-nav quid-nav-item inactive" style="display:flex; flex-direction:column; align-items:center; gap:5px; text-decoration:none; width:100%; text-align:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2Z"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M12 13C8.03683 13 5.48769 14.4462 4.13838 16.655C3.30094 18.0259 3.62147 19.4526 4.47764 20.4474C5.29895 21.4018 6.62227 22 7.99999 22H16C17.3777 22 18.701 21.4018 19.5224 20.4474C20.3785 19.4526 20.6991 18.0259 19.8616 16.655C18.5123 14.4462 15.9632 13 12 13Z"></path></svg>
+        <span style="font-size:11px; font-weight:600;">Contacts</span>
+      </a>
+      <a class="quid-nav quid-nav-item inactive" style="display:flex; flex-direction:column; align-items:center; gap:5px; text-decoration:none; width:100%; text-align:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="3.3" r="1.5"></circle><rect x="11.25" y="3.6" width="1.5" height="3.2" rx="0.75"></rect><rect x="3.5" y="6.5" width="17" height="13" rx="5"></rect><circle cx="9" cy="13" r="1.75" fill="var(--card)"></circle><circle cx="15" cy="13" r="1.75" fill="var(--card)"></circle></svg>
+        <span style="font-size:11px; font-weight:600;">Agents</span>
+      </a>
+          <a class="quid-nav quid-nav-item inactive" style="display:flex; flex-direction:column; align-items:center; gap:5px; text-decoration:none; width:100%; text-align:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M3 16L8.96685 16C9.51914 16 9.96685 16.4477 9.96685 17C9.96685 17.5523 9.51914 18 8.96685 18L3 18C2.44772 18 2 17.5523 2 17C2 16.4477 2.44772 16 3 16Z"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M14 7C14 6.44772 14.4477 6 15 6H21C21.5523 6 22 6.44772 22 7C22 7.55228 21.5523 8 21 8H15C14.4477 8 14 7.55228 14 7Z"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M2 7C2 6.44772 2.44772 6 3 6H3.01C3.56228 6 4.01 6.44772 4.01 7C4.01 7.55228 3.56228 8 3.01 8H3C2.44772 8 2 7.55228 2 7Z"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M20 17C20 16.4477 20.4477 16 21 16H21.01C21.5623 16 22.01 16.4477 22.01 17C22.01 17.5523 21.5623 18 21.01 18H21C20.4477 18 20 17.5523 20 17Z"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M15 13C12.7856 13 11 14.7961 11 17C11 19.2039 12.7856 21 15 21C17.2144 21 19 19.2039 19 17C19 14.7961 17.2144 13 15 13Z"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M9 3C6.78562 3 5 4.79609 5 7C5 9.20391 6.78562 11 9 11C11.2144 11 13 9.20391 13 7C13 4.79609 11.2144 3 9 3Z"></path></svg>
+        <span style="font-size:11px; font-weight:600;">Integrations</span>
+      </a>
+    </nav>
+
+    <div style="flex:1;"></div>
+
+    <div style="display:flex; flex-direction:column; align-items:center; gap:24px; width:100%;">
+      <a class="quid-nav quid-nav-item inactive" style="display:flex; flex-direction:column; align-items:center; gap:5px; text-decoration:none; width:100%; text-align:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M11.2707 2C9.86736 2 8.7297 3.13766 8.7297 4.54104C8.7297 4.74442 8.58945 5.01577 8.25424 5.19782C8.15109 5.25384 8.04936 5.3121 7.94912 5.37253C7.6148 5.57407 7.30096 5.56113 7.1167 5.4557C5.8929 4.75548 4.3334 5.17333 3.62365 6.39163L2.91923 7.60077C2.20812 8.82141 2.62778 10.3877 3.85393 11.0892C4.0317 11.191 4.19885 11.4497 4.19071 11.8346C4.18955 11.8896 4.18896 11.9448 4.18896 12C4.18896 12.0553 4.18955 12.1104 4.19071 12.1654C4.18955 12.5504 4.03171 12.8091 3.85395 12.9108C2.62781 13.6123 2.20815 15.1786 2.91926 16.3992L3.6237 17.6084C4.33345 18.8267 5.89293 19.2445 7.11673 18.5443C7.30099 18.4389 7.61481 18.4259 7.94912 18.6275C8.04936 18.6879 8.15109 18.7462 8.25424 18.8022C8.58945 18.9842 8.7297 19.2556 8.7297 19.459C8.7297 20.8623 9.86736 22 11.2707 22H12.7294C14.1328 22 15.2704 20.8623 15.2704 19.459C15.2704 19.2556 15.4107 18.9842 15.7459 18.8022C15.849 18.7462 15.9508 18.6879 16.051 18.6275C16.3853 18.4259 16.6991 18.4389 16.8834 18.5443C18.1072 19.2445 19.6667 18.8267 20.3764 17.6084L21.0809 16.3992C21.792 15.1786 21.3723 13.6123 20.1462 12.9108C19.9684 12.8091 19.8013 12.5504 19.8094 12.1654C19.8106 12.1104 19.8112 12.0552 19.8112 12C19.8112 11.9448 19.8106 11.8896 19.8094 11.8346C19.8013 11.4496 19.9684 11.1909 20.1462 11.0892C21.3724 10.3877 21.792 8.8214 21.0809 7.60076L20.3765 6.39162C19.6667 5.17332 18.1072 4.75547 16.8834 5.45569C16.6992 5.56113 16.3853 5.57406 16.051 5.37252C15.9508 5.31209 15.8491 5.25384 15.7459 5.19782C15.4107 5.01577 15.2704 4.74442 15.2704 4.54104C15.2704 3.13766 14.1328 2 12.7294 2H11.2707ZM12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9Z" fill="currentColor"></path></svg>
+        <span style="font-size:11px; font-weight:600;">Settings</span>
+      </a>
+      <div style="position:relative; display:flex; flex-direction:column; align-items:center;">
+        <div onClick="{{ toggleLogo }}" style="position:relative; width:38px; height:38px; cursor:pointer;">
+          <div style="width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:#0A0A0A; background-color:var(--accent,#A8E831); overflow:hidden; transition:filter .15s;" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">M</div>
+          <div style="position:absolute; right:-1px; top:-1px; width:10px; height:10px; background:#4ADE80; border:2px solid var(--card); border-radius:50%;"></div>
+        </div>
+        <sc-if value="{{ logoOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; bottom:46px; left:50px; width:210px; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:10px; box-shadow:0 8px 32px rgba(0,0,0,.4); z-index:200; animation:quidpop .15s ease;">
+            <div style="display:flex; align-items:center; gap:9px; padding:6px 6px 10px; border-bottom:1px solid var(--line); margin-bottom:8px;">
+              <div style="width:28px; height:28px; border-radius:50%; flex-shrink:0; background:var(--accent,#A8E831); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#0A0A0A;">M</div>
+              <div>
+                <div style="font-size:13px; font-weight:700; color:var(--text);">My Workspace</div>
+                <div style="font-size:11px; color:var(--text3);">Admin</div>
+              </div>
+            </div>
+            <div style="font-size:10.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--text3); margin-bottom:7px; padding:0 4px;">Appearance</div>
+            <div style="display:flex; background:var(--raised); border:1px solid var(--border); border-radius:9px; padding:3px; gap:2px; margin-bottom:10px;">
+              <button type="button" class="quid-seg" data-on="{{ darkOn }}" onClick="{{ setDark }}" style="flex:1; justify-content:center; font-size:12px; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path></svg>Dark</button>
+              <button type="button" class="quid-seg" data-on="{{ lightOn }}" onClick="{{ setLight }}" style="flex:1; justify-content:center; font-size:12px; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5 5l1.4 1.4M17.6 17.6l1.4 1.4M19 5l-1.4 1.4M6.4 17.6L5 19"></path></svg>Light</button>
+            </div>
+            <div style="height:1px; background:var(--line); margin-bottom:8px;"></div>
+            <button class="quid-ghost" style="width:100%; display:flex; align-items:center; gap:9px; background:transparent; border:none; cursor:pointer; font-family:inherit; font-size:13px; font-weight:600; color:#F87171; padding:7px 8px; border-radius:9px; text-align:left;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
+              Log out
+            </button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <main style="flex:1; height:100%; overflow-y:auto; display:flex; flex-direction:column; min-width:0;">
+
+    <!-- topbar -->
+    <header style="position:sticky; top:0; z-index:10; display:flex; align-items:center; justify-content:space-between; padding:20px 28px; background:var(--header); backdrop-filter:blur(12px); border-bottom:1px solid var(--line);">
+      <div>
+        <h1 style="margin:0; font-size:21px; font-weight:800; letter-spacing:-.02em;">Products</h1>
+        <p style="margin:4px 0 0; font-size:13px; color:var(--text2);">The catalog your agents use to answer and recommend.</p>
+      </div>
+      
+    </header>
+
+    <div style="padding:24px 28px 36px; display:flex; flex-direction:column; gap:18px;">
+
+      <!-- KPI strip -->
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px;">
+        <div style="background:var(--card); border:1px solid var(--border); border-radius:18px; padding:18px; display:flex; align-items:center; gap:14px;">
+          <div style="width:42px; height:42px; border-radius:12px; background:var(--accent,#A8E831); display:flex; align-items:center; justify-content:center; color:#0A0A0A; flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M6.45925 6C4.02505 6 2.1552 8.15595 2.49945 10.5657L3.51965 17.7071C3.87155 20.1704 5.98115 22 8.4694 22H15.531C18.0193 22 20.1289 20.1704 20.4808 17.7071L21.501 10.5657C21.8452 8.15595 19.9754 6 17.5412 6H6.45925Z"></path></svg>
+          </div>
+          <div><div style="font-size:12.5px; color:var(--text2); font-weight:600;">Total products</div><div style="font-size:25px; font-weight:800; letter-spacing:-.02em; margin-top:2px;">128</div></div>
+        </div>
+        <div style="background:var(--card); border:1px solid var(--border); border-radius:18px; padding:18px; display:flex; align-items:center; gap:14px;">
+          <div style="width:42px; height:42px; border-radius:12px; background:rgba(74,222,128,.14); border:1px solid rgba(74,222,128,.28); display:flex; align-items:center; justify-content:center; color:#4ADE80; flex-shrink:0;">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+          </div>
+          <div><div style="font-size:12.5px; color:var(--text2); font-weight:600;">In stock</div><div style="font-size:25px; font-weight:800; letter-spacing:-.02em; margin-top:2px;">112</div></div>
+        </div>
+        <div style="background:var(--card); border:1px solid var(--border); border-radius:18px; padding:18px; display:flex; align-items:center; gap:14px;">
+          <div style="width:42px; height:42px; border-radius:12px; background:rgba(251,191,36,.14); border:1px solid rgba(251,191,36,.28); display:flex; align-items:center; justify-content:center; color:#FBBF24; flex-shrink:0;">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" opacity=".25"></path><path fill-rule="evenodd" d="M12 8a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0V9a1 1 0 0 1 1-1zm0 8.5a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2z"></path></svg>
+          </div>
+          <div><div style="font-size:12.5px; color:var(--text2); font-weight:600;">Low stock</div><div style="font-size:25px; font-weight:800; letter-spacing:-.02em; margin-top:2px;">11</div></div>
+        </div>
+        <div style="background:var(--card); border:1px solid var(--border); border-radius:18px; padding:18px; display:flex; align-items:center; gap:14px;">
+          <div style="width:42px; height:42px; border-radius:12px; background:rgba(248,113,113,.14); border:1px solid rgba(248,113,113,.28); display:flex; align-items:center; justify-content:center; color:#F87171; flex-shrink:0;">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+          </div>
+          <div><div style="font-size:12.5px; color:var(--text2); font-weight:600;">Out of stock</div><div style="font-size:25px; font-weight:800; letter-spacing:-.02em; margin-top:2px;">5</div></div>
+        </div>
+      </div>
+
+      <!-- table card -->
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:20px;">
+        <!-- filter row -->
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 22px; border-bottom:1px solid var(--line);">
+          <div style="display:flex; gap:7px;">
+            <button class="quid-tab" style="font-family:inherit; font-size:12.5px; font-weight:700; padding:7px 14px; border-radius:9px; border:none; cursor:pointer; background:var(--track); color:var(--text);">All <span style="color:var(--text3); font-weight:600;">128</span></button>
+            <button class="quid-tab" style="font-family:inherit; font-size:12.5px; font-weight:600; padding:7px 14px; border-radius:9px; border:none; cursor:pointer; background:transparent; color:var(--text2); transition:.18s;">Active</button>
+            <button class="quid-tab" style="font-family: inherit; font-size: 12.5px; font-weight: 600; padding: 7px 14px; border-radius: 9px; border: none; cursor: pointer; background: transparent; color: var(--text2); transition: .18s; position: relative">Low stock</button><button class="quid-tab" style="font-family:inherit; font-size:12.5px; font-weight:600; padding:7px 14px; border-radius:9px; border:none; cursor:pointer; background:transparent; color:var(--text2); transition:.18s;">Out of<span style="caret-color: rgb(138, 138, 146); color: rgb(138, 138, 146);">&nbsp;stock</span></button>
+            
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="display:flex; align-items:center; gap:10px; background:var(--raised); border:1px solid var(--border); border-radius:9px; padding:8px 12px; width:230px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+              <input placeholder="Search products" style="flex:1; min-width:0; background:transparent; border:none; outline:none; color:var(--text); font-family:inherit; font-size:13px;">
+            </div>
+            <button class="quid-ghost" style="display:flex; align-items:center; gap:7px; font-family:inherit; font-size:12.5px; font-weight:600; color:var(--text2); background:var(--raised); border:1px solid var(--border); border-radius:9px; padding:8px 12px; cursor:pointer;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.78584 3C4.24726 3 3 4.24726 3 5.78584C3 6.59295 3.28872 7.37343 3.81398 7.98623L6.64813 11.2927C7.73559 12.5614 8.33333 14.1773 8.33333 15.8483V18C8.33333 19.6569 9.67648 21 11.3333 21H12.6667C14.3235 21 15.6667 19.6569 15.6667 18V15.8483C15.6667 14.1773 16.2644 12.5614 17.3519 11.2927L20.186 7.98624C20.7113 7.37343 21 6.59294 21 5.78584C21 4.24726 19.7527 3 18.2142 3H5.78584Z"></path></svg>
+              Category
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"></path></svg>
+            </button>
+            <button class="quid-btn" style="display:flex; align-items:center; gap:7px; border:none; cursor:pointer; font-family:inherit; font-size:13px; font-weight:700; padding:9px 15px; border-radius:9px; background:var(--accent,#A8E831); color:#0A0A0A;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM12 7C12.5523 7 13 7.44772 13 8V11H16C16.5523 11 17 11.4477 17 12C17 12.5523 16.5523 13 16 13H13V16C13 16.5523 12.5523 17 12 17C11.4477 17 11 16.5523 11 16V13H8C7.44772 13 7 12.5523 7 12C7 11.4477 7.44772 11 8 11H11V8C11 7.44772 11.4477 7 12 7Z"></path></svg>
+              Add product
+            </button>
+          </div>
+        </div>
+
+        <!-- table header -->
+        <div style="display:grid; grid-template-columns:2.4fr 1fr 0.9fr 1.1fr 1fr 44px; gap:16px; padding:13px 22px; position:sticky; top:72px; z-index:3; background:var(--card); border-bottom:2px solid var(--border); font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--text3);">
+          <span>Product</span><span>Category</span><span>Price</span><span>Stock</span><span>AI status</span><span></span>
+        </div>
+
+        <!-- rows -->
+        <sc-for list="{{ products }}" as="p" hint-placeholder-count="8">
+          <div class="quid-prow" style="display:grid; grid-template-columns:2.4fr 1fr 0.9fr 1.1fr 1fr 44px; gap:16px; align-items:center; padding:14px 22px; border-bottom:1px solid var(--line); transition:background .15s;">
+            <div style="display:flex; align-items:center; gap:13px; min-width:0;">
+              <div style="width:42px; height:42px; border-radius:11px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:{{ p.iconBg }}; color:{{ p.iconColor }};">
+                <span style="font-size:17px; font-weight:800;">{{ p.glyph }}</span>
+              </div>
+              <div style="min-width:0;">
+                <div style="font-size:14px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ p.name }}</div>
+                <div style="font-size:12px; color:var(--text3); margin-top:2px;">{{ p.sku }}</div>
+              </div>
+            </div>
+            <span style="font-size:12.5px; font-weight:600; color:var(--text2);"><span style="display:inline-block; padding:4px 10px; border-radius:7px; background:var(--line); border:1px solid var(--border);">{{ p.category }}</span></span>
+            <span style="font-size:14px; font-weight:700;">{{ p.price }}</span>
+            <div>
+              <div style="font-size:13.5px; font-weight:700; color:{{ p.stockColor }};">{{ p.stock }}</div>
+              <div style="height:5px; border-radius:4px; background:var(--track); overflow:hidden; margin-top:5px; width:80px;"><div style="height:100%; width:{{ p.stockPct }}; border-radius:4px; background:{{ p.stockColor }};"></div></div>
+            </div>
+            <span style="display:flex; align-items:center; gap:7px; font-size:12px; font-weight:700; color:{{ p.aiColor }};"><span style="width:7px; height:7px; border-radius:50%; background:{{ p.aiColor }};"></span>{{ p.ai }}</span>
+            <div style="display:flex;align-items:center;gap:3px;justify-content:flex-end;">
+              <div class="row-qa">
+                <button title="Edit" class="quid-ghost" style="width:29px;height:29px;border-radius:8px;background:var(--raised);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
+                <button title="Archive" class="quid-ghost" style="width:29px;height:29px;border-radius:8px;background:var(--raised);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg></button>
+              </div>
+              <button class="quid-ghost row-dots" style="width:32px;height:32px;border-radius:9px;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg>
+              </button>
+            </div>
+          </div>
+        </sc-for>
+
+        <!-- footer -->
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 22px;">
+          <span style="font-size:12.5px; color:var(--text3); font-weight:600;">Showing 8 of 128 products</span>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <button class="quid-ghost" style="width:32px; height:32px; border-radius:8px; background:var(--raised); border:1px solid var(--border); cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text2);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 18l-6-6 6-6"></path></svg></button>
+            <button style="min-width:32px; height:32px; border-radius:8px; background:var(--accent,#A8E831); border:none; cursor:pointer; font-family:inherit; font-size:12.5px; font-weight:700; color:#0A0A0A;">1</button>
+            <button class="quid-ghost" style="min-width:32px; height:32px; border-radius:8px; background:var(--raised); border:1px solid var(--border); cursor:pointer; font-family:inherit; font-size:12.5px; font-weight:600; color:var(--text2);">2</button>
+            <button class="quid-ghost" style="min-width:32px; height:32px; border-radius:8px; background:var(--raised); border:1px solid var(--border); cursor:pointer; font-family:inherit; font-size:12.5px; font-weight:600; color:var(--text2);">3</button>
+            <button class="quid-ghost" style="width:32px; height:32px; border-radius:8px; background:var(--raised); border:1px solid var(--border); cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text2);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 18l6-6-6-6"></path></svg></button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:980},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;]},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#4ADE80&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#A8E831&quot;,&quot;#7C83F5&quot;,&quot;#F472B6&quot;,&quot;#4ADE80&quot;,&quot;#FBBF24&quot;]}}">
+class Component extends DCLogic {
+  state = { theme: null, logoOpen: false };
+  renderVals() {
+    const accent = this.props.accent ?? '#A8E831';
+    const products = [
+      { glyph:'X', name:'X200 Wireless Headset', sku:'SKU-X200', category:'Hardware', price:'$149', stock:'42 in stock', stockPct:'70%', stockColor:'#4ADE80', ai:'Synced', aiColor:accent, iconBg:'rgba(168,232,49,.14)', iconColor:accent },
+      { glyph:'P', name:'Pro Plan — Annual', sku:'PLAN-PRO-Y', category:'Subscription', price:'$290', stock:'Unlimited', stockPct:'100%', stockColor:'#7C83F5', ai:'Synced', aiColor:accent, iconBg:'rgba(124,131,245,.14)', iconColor:'#7C83F5' },
+      { glyph:'S', name:'Starter Plan', sku:'PLAN-START', category:'Subscription', price:'$49', stock:'Unlimited', stockPct:'100%', stockColor:'#7C83F5', ai:'Synced', aiColor:accent, iconBg:'rgba(124,131,245,.14)', iconColor:'#7C83F5' },
+      { glyph:'C', name:'USB-C Charging Cable', sku:'SKU-CBL9', category:'Add-ons', price:'$19', stock:'8 left', stockPct:'18%', stockColor:'#FBBF24', ai:'Synced', aiColor:accent, iconBg:'rgba(244,114,182,.14)', iconColor:'#F472B6' },
+      { glyph:'K', name:'Mechanical Keyboard K1', sku:'SKU-K1', category:'Hardware', price:'$89', stock:'24 in stock', stockPct:'52%', stockColor:'#4ADE80', ai:'Synced', aiColor:accent, iconBg:'rgba(168,232,49,.14)', iconColor:accent },
+      { glyph:'D', name:'Onboarding Add-on', sku:'ADD-ONB', category:'Add-ons', price:'$120', stock:'Service', stockPct:'100%', stockColor:'#F472B6', ai:'Draft', aiColor:'var(--text2)', iconBg:'rgba(244,114,182,.14)', iconColor:'#F472B6' },
+      { glyph:'M', name:'Studio Monitor M50', sku:'SKU-M50', category:'Hardware', price:'$320', stock:'Out of stock', stockPct:'0%', stockColor:'#F87171', ai:'Paused', aiColor:'#F87171', iconBg:'rgba(248,113,113,.12)', iconColor:'#F87171' },
+      { glyph:'W', name:'Extended Warranty', sku:'ADD-WAR', category:'Add-ons', price:'$39', stock:'Service', stockPct:'100%', stockColor:'#4ADE80', ai:'Synced', aiColor:accent, iconBg:'rgba(45,212,191,.14)', iconColor:'#2DD4BF' },
+    ];
+    const __t = this.state.theme ?? this.props.theme ?? 'dark';
+    return { theme: __t, toggleTheme: () => this.setState(s => ({ theme: (s.theme ?? 'dark') === 'dark' ? 'light' : 'dark' })), isDark: __t === 'dark', isLight: __t === 'light', setDark: () => this.setState({ theme: 'dark' }), setLight: () => this.setState({ theme: 'light' }), darkOn: __t === 'dark' ? 'true' : 'false', lightOn: __t === 'light' ? 'true' : 'false', logoOpen: this.state.logoOpen, toggleLogo: () => this.setState(s => ({ logoOpen: !s.logoOpen })), accent, products };
+  }
+}
+</script>
+</body>
+</html>
