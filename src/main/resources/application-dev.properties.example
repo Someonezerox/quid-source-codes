@@ -1,6 +1,8 @@
+# Copy to application-dev.properties and fill in local DB credentials (that file is gitignored).
+# Credentials are read from env vars when set, otherwise fall back to the defaults below.
 spring.datasource.url=jdbc:postgresql://localhost:5432/quid
-spring.datasource.username=
-spring.datasource.password=
+spring.datasource.username=${DB_USERNAME:postgres}
+spring.datasource.password=${DB_PASSWORD:}
 
 # Schema: auto-update on startup so local changes apply immediately
 spring.jpa.hibernate.ddl-auto=update
@@ -9,7 +11,5 @@ spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 
-# Logging verbose security logs suppressed, app logs at DEBUG
 logging.level.org.example.quid=DEBUG
 logging.level.org.springframework.security=INFO
-logging.level.org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer=ERROR

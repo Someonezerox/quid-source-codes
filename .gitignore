@@ -40,3 +40,6 @@ out/
 .env
 .env.local
 .env.*.local
+
+### Local dev config (contains DB credentials) ###
+src/main/resources/application-dev.properties
