@@ -58,7 +58,16 @@
       "Bash(awk '{print $2, $11, $12, $13}')",
       "Bash(curl *)",
       "Bash(psql -d quid -c \"ALTER TABLE users ADD COLUMN IF NOT EXISTS enabled boolean NOT NULL DEFAULT true;\")",
-      "Bash(psql -d quid -c \"\\\\d users\")"
+      "Bash(psql -d quid -c \"\\\\d users\")",
+      "Bash(psql -d quid -c \"ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;\")",
+      "Bash(psql -d quid -c \"ALTER TABLE users ADD CONSTRAINT users_role_check CHECK \\(role IN \\('AGENT','ADMIN'\\)\\);\")",
+      "Bash(lsof -nP -iTCP:8080 -sTCP:LISTEN -t)",
+      "Bash(xargs -r kill)",
+      "Bash(psql -d quid -c \"SELECT role, count\\(*\\) FROM users GROUP BY role;\")",
+      "Bash(psql -d quid -t -c \"SELECT 'users', count\\(*\\) FROM users UNION ALL SELECT 'workspaces', count\\(*\\) FROM workspaces UNION ALL SELECT 'conversations', count\\(*\\) FROM conversations UNION ALL SELECT 'messages', count\\(*\\) FROM messages UNION ALL SELECT 'agents', count\\(*\\) FROM agents UNION ALL SELECT 'customers', count\\(*\\) FROM customers;\")",
+      "Bash(psql -d quid -c \"DROP SCHEMA public CASCADE; CREATE SCHEMA public;\")",
+      "Bash(break)",
+      "Bash(psql -d quid -t -c \"SELECT column_name FROM information_schema.columns WHERE table_name='users' ORDER BY 1;\")"
     ]
   }
 }
