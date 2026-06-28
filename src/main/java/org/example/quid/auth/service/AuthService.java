@@ -3,6 +3,7 @@ package org.example.quid.auth.service;
 import lombok.RequiredArgsConstructor;
 import org.example.quid.auth.dto.AuthResponse;
 import org.example.quid.auth.dto.LoginRequest;
+import org.example.quid.auth.dto.MeResponse;
 import org.example.quid.auth.dto.RegisterRequest;
 import org.example.quid.auth.entity.RefreshToken;
 import org.example.quid.auth.repository.RefreshTokenRepository;
@@ -86,6 +87,18 @@ public class AuthService {
 
     public void logout(String rawToken) {
         refreshTokenRepository.findByToken(rawToken).ifPresent(t -> t.setRevoked(true));
+    }
+
+    @Transactional(readOnly = true)
+    public MeResponse me(User user) {
+        Workspace ws = user.getWorkspace();
+        return new MeResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getFullName(),
+                user.getRole().name(),
+                ws.getId(),
+                ws.getName());
     }
 
     private AuthResponse issueTokens(User user) {

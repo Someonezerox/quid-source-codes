@@ -4,10 +4,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.quid.auth.dto.AuthResponse;
 import org.example.quid.auth.dto.LoginRequest;
+import org.example.quid.auth.dto.MeResponse;
 import org.example.quid.auth.dto.RefreshRequest;
 import org.example.quid.auth.dto.RegisterRequest;
 import org.example.quid.auth.service.AuthService;
+import org.example.quid.user.entity.User;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -37,5 +40,10 @@ public class AuthController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void logout(@RequestBody RefreshRequest request) {
         authService.logout(request.refreshToken());
+    }
+
+    @GetMapping("/me")
+    public MeResponse me(@AuthenticationPrincipal User user) {
+        return authService.me(user);
     }
 }

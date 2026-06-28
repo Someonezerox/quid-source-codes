@@ -2,13 +2,13 @@ import { LogoutIcon } from '@/components/icons'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { SegmentedControl } from '@/components/SegmentedControl'
 import { useAuthStore } from '@/store/authStore'
+import { signOut } from '@/features/auth/session'
 import { useUiStore } from '@/store/uiStore'
 import { initials } from '@/lib/format'
 
 /** Workspace avatar + popover: identity, appearance toggle, logout. Ported from prototype. */
 export function WorkspaceMenu() {
   const user = useAuthStore((s) => s.user)
-  const logout = useAuthStore((s) => s.logout)
   const { theme, setTheme } = useUiStore()
   if (!user) return null
 
@@ -45,7 +45,7 @@ export function WorkspaceMenu() {
         />
         <button
           type="button"
-          onClick={logout}
+          onClick={signOut}
           className="flex w-full items-center gap-2.5 rounded-[9px] px-2 py-1.5 text-left text-[13px] font-semibold text-destructive hover:bg-accent"
         >
           <LogoutIcon size={15} />

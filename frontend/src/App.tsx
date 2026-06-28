@@ -4,15 +4,17 @@ import { ProtectedRoute } from '@/router/ProtectedRoute'
 import { RoleGuard } from '@/router/RoleGuard'
 import { Placeholder } from '@/pages/Placeholder'
 import { Styleguide } from '@/pages/Styleguide'
-import { LoginStub } from '@/pages/LoginStub'
+import { LoginPage } from '@/features/auth/LoginPage'
+import { useAuthBootstrap } from '@/features/auth/session'
 import { useApplyTheme } from '@/store/uiStore'
 
 function App() {
   useApplyTheme()
+  useAuthBootstrap()
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<LoginStub />} />
+        <Route path="/login" element={<LoginPage />} />
 
         <Route element={<ProtectedRoute />}>
           <Route element={<AppShell />}>

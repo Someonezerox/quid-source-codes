@@ -46,7 +46,10 @@
       "Bash(npx --yes shadcn@latest add popover -y)",
       "Bash(grep -vE \"fast refresh|only-export|^$\")",
       "Bash(npm uninstall *)",
-      "Bash(grep -ivE \"fast refresh|only-export|^>|^$|oxlint\")"
+      "Bash(grep -ivE \"fast refresh|only-export|^>|^$|oxlint\")",
+      "Bash(grep -vE \"^\\\\s*$\")",
+      "Bash(./gradlew compileJava -q)",
+      "Bash(echo \"EXIT=$?\")"
     ]
   }
 }
