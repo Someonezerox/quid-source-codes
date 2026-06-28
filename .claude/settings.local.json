@@ -28,7 +28,17 @@
       "mcp__plugin_claude-mem_mcp-search__search",
       "Bash(xargs sed -i '' -e 's/org\\\\.example\\\\.quid\\\\.conversation\\\\.entity\\\\.ConversationStatus/org.example.quid.conversation.enums.ConversationStatus/g' -e 's/org\\\\.example\\\\.quid\\\\.conversation\\\\.entity\\\\.MessageRole/org.example.quid.conversation.enums.MessageRole/g' -e 's/org\\\\.example\\\\.quid\\\\.channel\\\\.entity\\\\.ChannelType/org.example.quid.channel.enums.ChannelType/g' -e 's/org\\\\.example\\\\.quid\\\\.customer\\\\.entity\\\\.CustomerStatus/org.example.quid.customer.enums.CustomerStatus/g' -e 's/org\\\\.example\\\\.quid\\\\.user\\\\.entity\\\\.Role/org.example.quid.user.enums.Role/g')",
       "Bash(git *)",
-      "Bash(xargs cat)"
+      "Bash(xargs cat)",
+      "Bash(npm -v)",
+      "Bash(rm -rf vite-app)",
+      "Bash(npm create *)",
+      "Bash(npm install *)",
+      "Bash(npx --yes shadcn@latest init -b neutral -y)",
+      "Bash(npx --yes shadcn@latest init --help)",
+      "Bash(npx --yes shadcn@latest init -t vite -b radix -y)",
+      "Bash(npx --yes shadcn@latest init -t vite -p radix-nova -y)",
+      "Bash(npx --yes shadcn@latest init -t vite -b radix -p nova -y)",
+      "Bash(npm run *)"
     ]
   }
 }

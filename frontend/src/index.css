@@ -1,0 +1,146 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/manrope";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --font-heading: var(--font-sans);
+    --font-sans: 'Manrope Variable', system-ui, sans-serif;
+    --color-canvas: var(--canvas);
+    --color-raised: var(--raised);
+    --color-text-3: var(--text-3);
+    --color-status-ai: var(--status-ai);
+    --color-status-human: var(--status-human);
+    --color-status-resolved: var(--status-resolved);
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Light theme — prototype `data-theme="light"` palette. Accent (lime) = primary. */
+:root {
+    --accent-brand: #A8E831;
+    --background: #F7F7F8;
+    --foreground: #18181B;
+    --canvas: #F7F7F8;
+    --card: #FFFFFF;
+    --card-foreground: #18181B;
+    --raised: #F4F4F5;
+    --popover: #FFFFFF;
+    --popover-foreground: #18181B;
+    --primary: var(--accent-brand);
+    --primary-foreground: #0A0A0A;
+    --secondary: #F4F4F5;
+    --secondary-foreground: #18181B;
+    --muted: #F4F4F5;
+    --muted-foreground: #52525B;
+    --text-3: #8E8E93;
+    --accent: #F4F4F5;
+    --accent-foreground: #18181B;
+    --destructive: #EF4444;
+    --border: #E4E4E7;
+    --input: #E4E4E7;
+    --ring: var(--accent-brand);
+    --status-ai: var(--accent-brand);
+    --status-human: #FBBF24;
+    --status-resolved: #4ADE80;
+    --chart-1: var(--accent-brand);
+    --chart-2: #4ADE80;
+    --chart-3: #7C83F5;
+    --chart-4: #FBBF24;
+    --chart-5: #F472B6;
+    --radius: 0.85rem;
+    --sidebar: #FFFFFF;
+    --sidebar-foreground: #18181B;
+    --sidebar-primary: var(--accent-brand);
+    --sidebar-primary-foreground: #0A0A0A;
+    --sidebar-accent: #F4F4F5;
+    --sidebar-accent-foreground: #18181B;
+    --sidebar-border: #E4E4E7;
+    --sidebar-ring: var(--accent-brand);
+}
+
+/* Dark theme — prototype default palette. Accent overridable at runtime via uiStore. */
+.dark {
+    --background: #0A0A0A;
+    --foreground: #F5F5F5;
+    --canvas: #0A0A0A;
+    --card: #141414;
+    --card-foreground: #F5F5F5;
+    --raised: #1E1E1E;
+    --popover: #141414;
+    --popover-foreground: #F5F5F5;
+    --primary: var(--accent-brand);
+    --primary-foreground: #0A0A0A;
+    --secondary: #1E1E1E;
+    --secondary-foreground: #F5F5F5;
+    --muted: #1E1E1E;
+    --muted-foreground: #A1A1A6;
+    --text-3: #6B6B70;
+    --accent: #1E1E1E;
+    --accent-foreground: #F5F5F5;
+    --destructive: #F87171;
+    --border: #242424;
+    --input: #242424;
+    --ring: var(--accent-brand);
+    --status-ai: var(--accent-brand);
+    --status-human: #FBBF24;
+    --status-resolved: #4ADE80;
+    --sidebar: #141414;
+    --sidebar-foreground: #F5F5F5;
+    --sidebar-primary: var(--accent-brand);
+    --sidebar-primary-foreground: #0A0A0A;
+    --sidebar-accent: #1E1E1E;
+    --sidebar-accent-foreground: #F5F5F5;
+    --sidebar-border: #242424;
+    --sidebar-ring: var(--accent-brand);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+  html {
+    @apply font-sans;
+    }
+}
