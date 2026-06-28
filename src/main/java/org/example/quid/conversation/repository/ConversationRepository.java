@@ -4,6 +4,7 @@ import org.example.quid.conversation.entity.Conversation;
 import org.example.quid.conversation.enums.ConversationStatus;
 import org.example.quid.customer.entity.Customer;
 import org.example.quid.workspace.entity.Workspace;
+import org.example.quid.workspace.entity.Workspace;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -30,6 +31,8 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
     Optional<Conversation> findByIdWithDetails(@Param("id") Long id);
 
     long countByAiAgent_Id(Long agentId);
+    long countByAiAgent_IdAndStatus(Long agentId, ConversationStatus status);
+    long countByCustomer(Customer customer);
 
     @Query("SELECT AVG(c.confidenceScore) FROM Conversation c WHERE c.aiAgent.id = :agentId AND c.confidenceScore IS NOT NULL")
     Double avgConfidenceByAiAgentId(@Param("agentId") Long agentId);

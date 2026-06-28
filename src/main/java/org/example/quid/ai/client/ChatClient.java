@@ -3,6 +3,7 @@ package org.example.quid.ai.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.example.quid.ai.dto.AiResponse;
+import org.example.quid.ai.dto.MemoryExtraction;
 import org.example.quid.ai.properties.AiProperties;
 import org.example.quid.conversation.entity.Message;
 import org.example.quid.conversation.enums.MessageRole;
@@ -15,6 +16,13 @@ import java.util.List;
 @Slf4j
 @Component
 public class ChatClient {
+
+    private static final String SUMMARY_PROMPT = """
+            Analyze this customer service conversation and respond ONLY with valid JSON (no markdown, no extra text):
+            {"summary": "2-3 sentence summary of what the customer needed and the outcome", "preferences": {"key": "value"}}
+            Only include preferences that are clearly evident. Useful keys: preferred_language, communication_style, product_interest, issues_reported.
+            If no preferences are evident use an empty object for preferences.
+            """;
 
     private static final String PROMPT_SUFFIX = """
 
@@ -63,6 +71,28 @@ public class ChatClient {
         } catch (Exception e) {
             log.error("Chat API call failed", e);
             return new AiResponse("I'm unable to assist at the moment. A human agent will help you shortly.", 0.0);
+        }
+    }
+
+    public MemoryExtraction summarize(List<Message> history) {
+        List<ChatMsg> messages = new ArrayList<>();
+        messages.add(new ChatMsg("system", SUMMARY_PROMPT));
+        history.stream()
+                .map(m -> new ChatMsg(toRole(m.getRole()), m.getContent()))
+                .forEach(messages::add);
+
+        try {
+            var response = http.post()
+                    .uri("/chat/completions")
+                    .body(new Request(props.chatModel(), messages))
+                    .retrieve()
+                    .body(Response.class);
+
+            String text = response.choices().get(0).message().content();
+            return mapper.readValue(text, MemoryExtraction.class);
+        } catch (Exception e) {
+            log.error("Summarization API call failed", e);
+            return new MemoryExtraction("Summary unavailable.", java.util.Map.of());
         }
     }
 

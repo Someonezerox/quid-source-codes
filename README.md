@@ -300,10 +300,18 @@ curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://yourdomain.com/
 
 ---
 
-## Upcoming
+## Milestones
 
-| Milestone | Description |
-|---|---|
-| M7 | Human agent management — invite staff via email, deactivate accounts |
-| M8 | Real-time notifications (SSE) — push `NEEDS_HUMAN` events to connected agents |
-| M9 | Outbound webhooks — subscribe to QUID events, integrate with Zapier / Make / amoCRM / Sheets |
+| Milestone | Description | Status |
+|---|---|---|
+| M1 | Foundation — auth, JWT, workspace, user roles | ✅ Done |
+| M2 | Channel management — Telegram channel CRUD | ✅ Done |
+| M3 | Telegram webhook ingestion | ✅ Done |
+| M4 | Inbox API — conversation list, takeover, resolve, send message | ✅ Done |
+| M5 | AI routing — confidence-score engine, RAG, OpenRouter | ✅ Done |
+| M6 | AI Agent entity — persona, KB ownership, per-channel assignment | ✅ Done |
+| M7 | Human staff management — invite, list, deactivate | ✅ Done |
+| M8 | Real-time notifications — SSE stream, needs_human / message / assigned events | ✅ Done |
+| M9 | Google Sheets — auto-log every conversation to a spreadsheet, zero cost for users | 🔜 Planned |
+| M10 | Bitrix24 — native CRM sync for CIS market, no Zapier needed | 🔜 Planned |
+| M11 | Customer memory — cross-conversation summaries, preferences, AI learning | 🔜 Planned |

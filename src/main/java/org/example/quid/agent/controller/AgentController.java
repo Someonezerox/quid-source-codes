@@ -3,6 +3,7 @@ package org.example.quid.agent.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.quid.agent.dto.AgentDetailResponse;
+import org.example.quid.agent.dto.AgentLearningResponse;
 import org.example.quid.agent.dto.AgentRequest;
 import org.example.quid.agent.dto.AgentResponse;
 import org.example.quid.agent.service.AgentService;
@@ -64,5 +65,10 @@ public class AgentController {
                                     @PathVariable Long channelId,
                                     @AuthenticationPrincipal User user) {
         agentService.unassignFromChannel(channelId, user.getWorkspace());
+    }
+
+    @GetMapping("/{id}/learning")
+    public AgentLearningResponse getLearning(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        return agentService.getLearning(id, user.getWorkspace());
     }
 }

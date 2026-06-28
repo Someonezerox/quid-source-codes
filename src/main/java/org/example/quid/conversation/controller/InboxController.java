@@ -7,6 +7,7 @@ import org.example.quid.conversation.dto.MessageResponse;
 import org.example.quid.conversation.dto.SendMessageRequest;
 import org.example.quid.conversation.enums.ConversationStatus;
 import org.example.quid.conversation.service.InboxService;
+import org.example.quid.customer.service.MemoryService;
 import org.example.quid.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,7 @@ import java.util.List;
 public class InboxController {
 
     private final InboxService inboxService;
+    private final MemoryService memoryService;
 
     @GetMapping
     public Page<ConversationSummaryResponse> list(
@@ -51,7 +53,8 @@ public class InboxController {
     @PostMapping("/{id}/resolve")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void resolve(@PathVariable Long id, @AuthenticationPrincipal User user) {
-        inboxService.resolve(id, user.getWorkspace());
+        inboxService.resolve(id, user.getWorkspace()); // transaction commits here
+        memoryService.summarize(id);                   // async — safe to call after commit
     }
 
     @PostMapping("/{id}/messages")

@@ -9,6 +9,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -18,6 +20,10 @@ public class CustomerService {
 
     public Customer findOrCreate(TelegramUser from, Workspace workspace) {
         return customerRepository.findByTelegramIdAndWorkspace(from.id(), workspace)
+                .map(c -> {
+                    c.setLastSeenAt(Instant.now());
+                    return c;
+                })
                 .orElseGet(() -> {
                     try {
                         Customer c = new Customer();
@@ -26,9 +32,9 @@ public class CustomerService {
                         c.setLastName(from.lastName());
                         c.setUsername(from.username());
                         c.setWorkspace(workspace);
+                        c.setLastSeenAt(Instant.now());
                         return customerRepository.saveAndFlush(c);
                     } catch (DataIntegrityViolationException e) {
-                        // concurrent insert for same telegramId+workspace — re-fetch the winner
                         return customerRepository.findByTelegramIdAndWorkspace(from.id(), workspace).orElseThrow();
                     }
                 });

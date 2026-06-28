@@ -14,6 +14,7 @@ import org.example.quid.conversation.repository.ConversationRepository;
 import org.example.quid.conversation.repository.MessageRepository;
 import org.example.quid.conversation.service.ConversationService;
 import org.example.quid.customer.entity.Customer;
+import org.example.quid.customer.service.MemoryService;
 import org.example.quid.notification.NotificationService;
 import org.example.quid.telegram.client.TelegramBotClient;
 import org.springframework.scheduling.annotation.Async;
@@ -36,6 +37,7 @@ public class AiRoutingService {
     private final RagService ragService;
     private final ChatClient chatClient;
     private final TelegramBotClient telegramBotClient;
+    private final MemoryService memoryService;
     private final NotificationService notificationService;
     private final AiProperties props;
 
@@ -57,7 +59,9 @@ public class AiRoutingService {
                     : history;
 
             String lastMessage = history.get(history.size() - 1).getContent();
-            String context = ragService.buildContext(lastMessage, agent);
+            String ragContext = ragService.buildContext(lastMessage, agent);
+            String memoryContext = memoryService.buildContext(conv.getCustomer());
+            String context = combineContexts(memoryContext, ragContext);
 
             AiResponse aiResponse = chatClient.chat(agent.getSystemPrompt(), context, window);
             conv.setConfidenceScore(aiResponse.confidence());
@@ -80,6 +84,12 @@ public class AiRoutingService {
             conv.setStatus(ConversationStatus.NEEDS_HUMAN);
             notificationService.emit(conv.getWorkspace().getId(), "needs_human", customerPayload(conv));
         }
+    }
+
+    private static String combineContexts(String memory, String rag) {
+        return java.util.stream.Stream.of(memory, rag)
+                .filter(s -> s != null && !s.isBlank())
+                .collect(Collectors.joining("\n\n=== Knowledge Base ===\n"));
     }
 
     private static Map<String, Object> customerPayload(Conversation conv) {

@@ -2,6 +2,7 @@ package org.example.quid.agent.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.quid.agent.dto.AgentDetailResponse;
+import org.example.quid.agent.dto.AgentLearningResponse;
 import org.example.quid.agent.dto.AgentRequest;
 import org.example.quid.agent.dto.AgentResponse;
 import org.example.quid.agent.entity.Agent;
@@ -11,6 +12,7 @@ import org.example.quid.channel.dto.ChannelResponse;
 import org.example.quid.channel.entity.Channel;
 import org.example.quid.channel.mapper.ChannelMapper;
 import org.example.quid.channel.repository.ChannelRepository;
+import org.example.quid.conversation.enums.ConversationStatus;
 import org.example.quid.conversation.repository.ConversationRepository;
 import org.example.quid.exception.ResourceNotFoundException;
 import org.example.quid.knowledge.dto.KnowledgeBaseResponse;
@@ -87,6 +89,16 @@ public class AgentService {
     public Agent getOrThrow(Long id, Workspace workspace) {
         return agentRepository.findByIdAndWorkspace(id, workspace)
                 .orElseThrow(() -> new ResourceNotFoundException("Agent not found"));
+    }
+
+    @Transactional(readOnly = true)
+    public AgentLearningResponse getLearning(Long id, Workspace workspace) {
+        Agent agent = getOrThrow(id, workspace);
+        long total = conversationRepository.countByAiAgent_Id(agent.getId());
+        long resolved = conversationRepository.countByAiAgent_IdAndStatus(agent.getId(), ConversationStatus.RESOLVED);
+        double rate = total == 0 ? 0.0 : (double) resolved / total;
+        return new AgentLearningResponse(total, resolved, rate,
+                conversationRepository.avgConfidenceByAiAgentId(agent.getId()));
     }
 
     private AgentResponse toResponse(Agent agent) {

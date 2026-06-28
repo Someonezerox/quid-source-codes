@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
     Optional<Customer> findByTelegramIdAndWorkspace(Long telegramId, Workspace workspace);
+    Optional<Customer> findByIdAndWorkspace(Long id, Workspace workspace);
 }

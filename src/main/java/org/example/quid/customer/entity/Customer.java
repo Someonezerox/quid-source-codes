@@ -31,6 +31,11 @@ public class Customer {
     @Column(nullable = false)
     private CustomerStatus status = CustomerStatus.ACTIVE;
 
+    @Column(columnDefinition = "TEXT")
+    private String notes;
+
+    private Instant lastSeenAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspace_id", nullable = false)
     private Workspace workspace;
