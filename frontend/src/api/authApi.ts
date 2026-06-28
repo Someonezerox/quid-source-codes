@@ -6,6 +6,11 @@ export async function login(email: string, password: string): Promise<AuthTokens
   return data
 }
 
+export async function register(email: string, password: string, fullName: string): Promise<AuthTokens> {
+  const { data } = await publicApi.post<AuthTokens>('/auth/register', { email, password, fullName })
+  return data
+}
+
 export async function refreshTokens(refreshToken: string): Promise<AuthTokens> {
   const { data } = await publicApi.post<AuthTokens>('/auth/refresh', { refreshToken })
   return data
