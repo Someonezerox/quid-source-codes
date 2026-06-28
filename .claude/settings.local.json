@@ -38,7 +38,10 @@
       "Bash(npx --yes shadcn@latest init -t vite -b radix -y)",
       "Bash(npx --yes shadcn@latest init -t vite -p radix-nova -y)",
       "Bash(npx --yes shadcn@latest init -t vite -b radix -p nova -y)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(npx --yes shadcn@latest add badge -y)",
+      "Bash(npx)",
+      "Bash(echo \"LINT_EXIT=$?\")"
     ]
   }
 }
