@@ -44,7 +44,9 @@
       "Bash(echo \"LINT_EXIT=$?\")",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/styleguide)",
       "Bash(npx --yes shadcn@latest add popover -y)",
-      "Bash(grep -vE \"fast refresh|only-export|^$\")"
+      "Bash(grep -vE \"fast refresh|only-export|^$\")",
+      "Bash(npm uninstall *)",
+      "Bash(grep -ivE \"fast refresh|only-export|^>|^$|oxlint\")"
     ]
   }
 }

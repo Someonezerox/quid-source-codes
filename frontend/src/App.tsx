@@ -19,12 +19,12 @@ function App() {
             <Route index element={<Navigate to="/inbox" replace />} />
             <Route path="/dashboard" element={<Placeholder title="Dashboard" milestone="F4" />} />
             <Route path="/inbox" element={<Placeholder title="Inbox" milestone="F5" />} />
+            <Route path="/products" element={<Placeholder title="Products" milestone="F9" />} />
             <Route path="/contacts" element={<Placeholder title="Contacts" milestone="F10" />} />
             <Route path="/styleguide" element={<Styleguide />} />
 
             {/* ADMIN-only */}
             <Route element={<RoleGuard allow={['ADMIN']} />}>
-              <Route path="/usage" element={<Placeholder title="Usage" milestone="F9" />} />
               <Route path="/agents" element={<Placeholder title="Agents" milestone="F8" />} />
               <Route path="/integrations" element={<Placeholder title="Integrations" milestone="F11" />} />
               <Route path="/settings" element={<Placeholder title="Settings" milestone="F12" />} />

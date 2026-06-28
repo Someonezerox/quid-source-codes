@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom'
-import { Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { NAV_ITEMS } from '@/router/nav'
+import { LogoMark, SettingsIcon } from '@/components/icons'
 import { useAuthStore } from '@/store/authStore'
 import { WorkspaceMenu } from './WorkspaceMenu'
 
@@ -20,7 +20,7 @@ export function Sidebar() {
     <aside className="flex h-full w-[78px] shrink-0 flex-col items-center border-r border-border bg-sidebar px-0 py-6">
       <div className="mb-8 flex flex-col items-center gap-1.5">
         <div className="grid size-9 place-items-center rounded-[10px] bg-primary text-primary-foreground">
-          <span className="text-base font-extrabold">Q</span>
+          <LogoMark />
         </div>
         <span className="text-[12px] font-extrabold tracking-tight">QUID</span>
       </div>
@@ -39,7 +39,7 @@ export function Sidebar() {
       <div className="flex w-full flex-col items-center gap-6">
         {(!role || role === 'ADMIN') && (
           <NavLink to="/settings" className={linkClass}>
-            <Settings size={20} />
+            <SettingsIcon size={20} />
             <span>Settings</span>
           </NavLink>
         )}

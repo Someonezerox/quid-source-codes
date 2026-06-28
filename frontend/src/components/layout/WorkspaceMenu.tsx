@@ -1,4 +1,4 @@
-import { LogOut } from 'lucide-react'
+import { LogoutIcon } from '@/components/icons'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { SegmentedControl } from '@/components/SegmentedControl'
 import { useAuthStore } from '@/store/authStore'
@@ -48,7 +48,7 @@ export function WorkspaceMenu() {
           onClick={logout}
           className="flex w-full items-center gap-2.5 rounded-[9px] px-2 py-1.5 text-left text-[13px] font-semibold text-destructive hover:bg-accent"
         >
-          <LogOut size={15} />
+          <LogoutIcon size={15} />
           Log out
         </button>
       </PopoverContent>
