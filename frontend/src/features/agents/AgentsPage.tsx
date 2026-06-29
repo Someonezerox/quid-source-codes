@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
-import { Bot, CheckCircle2, MessageSquare, Plus, Search } from 'lucide-react'
+import { Bot, CheckCircle2, MessageSquare, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { PlusIcon } from '@/components/icons'
 import { StatCard } from '@/components/StatCard'
 import { Avatar } from '@/components/Avatar'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -24,9 +25,9 @@ export default function AgentsPage() {
     <div className="flex h-full flex-col">
       <header className="flex items-center justify-between border-b border-border px-7 py-[18px]">
         <h1 className="text-[21px] font-extrabold tracking-tight">Agents</h1>
-        <Button className="gap-2" onClick={() => setAddOpen(true)}>
-          <Plus size={16} />
-          Add agent
+        <Button onClick={() => setAddOpen(true)}>
+          <PlusIcon size={18} />
+          New agent
         </Button>
       </header>
 
@@ -63,9 +64,9 @@ export default function AgentsPage() {
               <Bot size={28} className="text-text-3" />
               <div className="text-[14px] font-bold">No agents yet</div>
               <div className="text-[13px] text-muted-foreground">Create your first AI agent to start handling chats.</div>
-              <Button className="mt-1 gap-2" onClick={() => setAddOpen(true)}>
-                <Plus size={16} />
-                Add agent
+              <Button className="mt-1" onClick={() => setAddOpen(true)}>
+                <PlusIcon size={18} />
+                New agent
               </Button>
             </div>
           ) : (
