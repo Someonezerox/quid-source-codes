@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { Bot, CheckCircle2, MessageSquare, Plus, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { StatCard } from '@/components/StatCard'
@@ -7,19 +6,17 @@ import { Avatar } from '@/components/Avatar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAgents } from './hooks'
 import { toAgentRow, toAgentStats } from './adapters'
-import { AgentFormDialog } from './AgentFormDialog'
+import { AgentWizard } from './AgentWizard'
 
 export default function AgentsPage() {
-  const navigate = useNavigate()
   const { data: agents, isLoading } = useAgents()
   const [search, setSearch] = useState('')
+  const [addOpen, setAddOpen] = useState(false)
+  const [editId, setEditId] = useState<number | null>(null)
 
   const stats = useMemo(() => (agents ? toAgentStats(agents) : null), [agents])
   const rows = useMemo(
-    () =>
-      (agents ?? [])
-        .map(toAgentRow)
-        .filter((a) => a.name.toLowerCase().includes(search.toLowerCase())),
+    () => (agents ?? []).map(toAgentRow).filter((a) => a.name.toLowerCase().includes(search.toLowerCase())),
     [agents, search],
   )
 
@@ -27,14 +24,10 @@ export default function AgentsPage() {
     <div className="flex h-full flex-col">
       <header className="flex items-center justify-between border-b border-border px-7 py-[18px]">
         <h1 className="text-[21px] font-extrabold tracking-tight">Agents</h1>
-        <AgentFormDialog
-          trigger={
-            <Button className="gap-2">
-              <Plus size={16} />
-              Add agent
-            </Button>
-          }
-        />
+        <Button className="gap-2" onClick={() => setAddOpen(true)}>
+          <Plus size={16} />
+          Add agent
+        </Button>
       </header>
 
       <div className="flex-1 space-y-5 overflow-y-auto p-7">
@@ -70,7 +63,10 @@ export default function AgentsPage() {
               <Bot size={28} className="text-text-3" />
               <div className="text-[14px] font-bold">No agents yet</div>
               <div className="text-[13px] text-muted-foreground">Create your first AI agent to start handling chats.</div>
-              <AgentFormDialog trigger={<Button className="mt-1 gap-2"><Plus size={16} />Add agent</Button>} />
+              <Button className="mt-1 gap-2" onClick={() => setAddOpen(true)}>
+                <Plus size={16} />
+                Add agent
+              </Button>
             </div>
           ) : (
             <>
@@ -83,7 +79,7 @@ export default function AgentsPage() {
               {rows.map((a) => (
                 <button
                   key={a.id}
-                  onClick={() => navigate(`/agents/${a.id}`)}
+                  onClick={() => setEditId(a.id)}
                   className="grid w-full grid-cols-[2.2fr_1fr_1fr_1fr] items-center gap-4 border-b border-border px-5 py-3.5 text-left transition-colors last:border-0 hover:bg-accent"
                 >
                   <div className="flex items-center gap-3">
@@ -107,6 +103,9 @@ export default function AgentsPage() {
           )}
         </div>
       </div>
+
+      <AgentWizard open={addOpen} onOpenChange={setAddOpen} />
+      <AgentWizard open={editId != null} onOpenChange={(o) => !o && setEditId(null)} agentId={editId ?? undefined} />
     </div>
   )
 }

@@ -10,7 +10,6 @@ import { useAuthBootstrap } from '@/features/auth/session'
 import { useApplyTheme } from '@/store/uiStore'
 
 const AgentsPage = lazy(() => import('@/features/agents/AgentsPage'))
-const AgentDetailPage = lazy(() => import('@/features/agents/AgentDetailPage'))
 
 function App() {
   useApplyTheme()
@@ -32,7 +31,6 @@ function App() {
             {/* ADMIN-only */}
             <Route element={<RoleGuard allow={['ADMIN']} />}>
               <Route path="/agents" element={<AgentsPage />} />
-              <Route path="/agents/:id" element={<AgentDetailPage />} />
               <Route path="/integrations" element={<Placeholder title="Integrations" milestone="F11" />} />
               <Route path="/settings" element={<Placeholder title="Settings" milestone="F12" />} />
             </Route>
