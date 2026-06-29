@@ -10,6 +10,7 @@ import {
   listAgents,
   listChannels,
   listEntries,
+  listUserbotGroups,
   updateAgent,
 } from '@/api/agentsApi'
 import type { AgentRequest } from '@/types/agents'
@@ -20,6 +21,15 @@ export function useAgents() {
 
 export function useChannels() {
   return useQuery({ queryKey: ['channels'], queryFn: listChannels, staleTime: 60_000 })
+}
+
+export function useUserbotGroups(channelId: number | null, enabled = true) {
+  return useQuery({
+    queryKey: ['userbot-groups', channelId],
+    queryFn: () => listUserbotGroups(channelId as number),
+    enabled: enabled && channelId != null,
+    staleTime: 30_000,
+  })
 }
 
 export function useAgent(id: number, enabled = true) {

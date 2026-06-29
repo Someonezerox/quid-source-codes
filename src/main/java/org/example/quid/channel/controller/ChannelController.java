@@ -1,8 +1,6 @@
 package org.example.quid.channel.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.quid.channel.dto.ChannelRequest;
 import org.example.quid.channel.dto.ChannelResponse;
 import org.example.quid.channel.service.ChannelService;
 import org.example.quid.user.entity.User;
@@ -19,13 +17,6 @@ public class ChannelController {
 
     private final ChannelService channelService;
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public ChannelResponse create(@Valid @RequestBody ChannelRequest request,
-                                  @AuthenticationPrincipal User user) {
-        return channelService.create(request, user.getWorkspace());
-    }
-
     @GetMapping
     public List<ChannelResponse> findAll(@AuthenticationPrincipal User user) {
         return channelService.findAll(user.getWorkspace());
@@ -34,13 +25,6 @@ public class ChannelController {
     @GetMapping("/{id}")
     public ChannelResponse findById(@PathVariable Long id, @AuthenticationPrincipal User user) {
         return channelService.findById(id, user.getWorkspace());
-    }
-
-    @PutMapping("/{id}")
-    public ChannelResponse update(@PathVariable Long id,
-                                  @Valid @RequestBody ChannelRequest request,
-                                  @AuthenticationPrincipal User user) {
-        return channelService.update(id, request, user.getWorkspace());
     }
 
     @DeleteMapping("/{id}")

@@ -53,6 +53,9 @@ public class Conversation {
     @Column(nullable = false)
     private ConversationStatus status = ConversationStatus.AI_HANDLING;
 
+    /** Telegram chat the conversation lives in — group id for groups, user id for DMs. Replies go here. */
+    private Long telegramChatId;
+
     private Double confidenceScore;
 
     @CreationTimestamp

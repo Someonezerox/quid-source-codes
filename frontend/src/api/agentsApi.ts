@@ -41,6 +41,43 @@ export async function assignAgentToChannel(agentId: number, channelId: number): 
   await api.put(`/agents/${agentId}/channels/${channelId}`)
 }
 
+// --- Telegram userbot connect (drives the Telethon sidecar) ---
+
+export async function sendUserbotCode(phone: string): Promise<{ phoneCodeHash: string }> {
+  const { data } = await api.post<{ phoneCodeHash: string }>('/userbot/send-code', { phone })
+  return data
+}
+
+export interface UserbotSignInBody {
+  phone: string
+  code: string
+  phoneCodeHash: string
+  password?: string
+  channelName?: string
+}
+
+/** On success creates + returns the new TELEGRAM_USERBOT channel. 409 → 2FA password needed, 400 → bad code. */
+export async function userbotSignIn(body: UserbotSignInBody): Promise<ChannelResponse> {
+  const { data } = await api.post<ChannelResponse>('/userbot/sign-in', body)
+  return data
+}
+
+export interface UserbotGroup {
+  id: number
+  title: string
+}
+
+/** Telegram groups the userbot account belongs to (the channel must have a live session). */
+export async function listUserbotGroups(channelId: number): Promise<UserbotGroup[]> {
+  const { data } = await api.get<UserbotGroup[]>(`/userbot/channels/${channelId}/groups`)
+  return data
+}
+
+/** Point the userbot at a group (null → DMs only). */
+export async function setUserbotGroup(channelId: number, chatId: number | null): Promise<void> {
+  await api.put(`/userbot/channels/${channelId}/group`, { chatId })
+}
+
 export async function getLearning(id: number): Promise<AgentLearningResponse> {
   const { data } = await api.get<AgentLearningResponse>(`/agents/${id}/learning`)
   return data

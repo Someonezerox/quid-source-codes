@@ -38,9 +38,9 @@ export interface ChannelResponse {
   id: number
   name: string
   type: string
-  webhookUrl: string | null
   active: boolean
   assignedAgentId: number | null
+  allowedChatId: number | null
   createdAt: string
 }
 

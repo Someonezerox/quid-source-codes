@@ -20,7 +20,7 @@ public class ConversationService {
     private final ConversationRepository conversationRepository;
     private final MessageRepository messageRepository;
 
-    public Conversation findOrCreateOpen(Customer customer, Channel channel) {
+    public Conversation findOrCreateOpen(Customer customer, Channel channel, Long telegramChatId) {
         return conversationRepository
                 .findTopByCustomerAndStatusNotOrderByCreatedAtDesc(customer, ConversationStatus.RESOLVED)
                 .orElseGet(() -> {
@@ -28,6 +28,7 @@ public class ConversationService {
                     conv.setCustomer(customer);
                     conv.setChannel(channel);
                     conv.setWorkspace(customer.getWorkspace());
+                    conv.setTelegramChatId(telegramChatId);
                     return conversationRepository.save(conv);
                 });
     }

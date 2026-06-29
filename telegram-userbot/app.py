@@ -22,13 +22,18 @@ import os
 import uuid
 import asyncio
 import logging
+from typing import Optional, Union
 
 import httpx
 from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel
 from telethon import TelegramClient, events
 from telethon.sessions import StringSession
-from telethon.errors import SessionPasswordNeededError, PhoneCodeInvalidError
+from telethon.errors import (
+    SessionPasswordNeededError,
+    PhoneCodeInvalidError,
+    PhoneNumberInvalidError,
+)
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("userbot")
@@ -49,7 +54,7 @@ active: dict[str, TelegramClient] = {}
 app = FastAPI(title="QUID userbot")
 
 
-def _check(token: str | None):
+def _check(token: Optional[str]):
     if INTERNAL_TOKEN and token != INTERNAL_TOKEN:
         raise HTTPException(status_code=401, detail="bad internal token")
 
@@ -76,6 +81,7 @@ async def _attach_and_run(session_id: str, client: TelegramClient):
             "senderId": event.sender_id,
             "senderName": name,
             "text": event.raw_text or "",
+            "isPrivate": event.is_private,
         }
         try:
             async with httpx.AsyncClient(timeout=10) as http:
@@ -96,12 +102,12 @@ class SignInReq(BaseModel):
     phone: str
     code: str
     phoneCodeHash: str
-    password: str | None = None
+    password: Optional[str] = None
 
 
 class SendMessageReq(BaseModel):
     sessionId: str
-    peer: str | int
+    peer: Union[str, int]
     text: str
 
 
@@ -125,28 +131,34 @@ async def startup():
 
 
 @app.post("/auth/send-code")
-async def send_code(req: SendCodeReq, x_internal_token: str | None = Header(default=None)):
+async def send_code(req: SendCodeReq, x_internal_token: Optional[str] = Header(default=None)):
     _check(x_internal_token)
     client = TelegramClient(StringSession(), API_ID, API_HASH)
     await client.connect()
-    sent = await client.send_code_request(req.phone)
+    try:
+        sent = await client.send_code_request(req.phone)
+    except PhoneNumberInvalidError:
+        raise HTTPException(status_code=400, detail="invalid phone number")
     pending[req.phone] = client
     return {"phoneCodeHash": sent.phone_code_hash}
 
 
 @app.post("/auth/sign-in")
-async def sign_in(req: SignInReq, x_internal_token: str | None = Header(default=None)):
+async def sign_in(req: SignInReq, x_internal_token: Optional[str] = Header(default=None)):
     _check(x_internal_token)
     client = pending.get(req.phone)
     if client is None:
         raise HTTPException(status_code=400, detail="no pending auth for this phone; request a code first")
     try:
-        try:
-            await client.sign_in(req.phone, req.code, phone_code_hash=req.phoneCodeHash)
-        except SessionPasswordNeededError:
-            if not req.password:
-                raise HTTPException(status_code=409, detail="2FA password required")
+        # Two-step flow: first call submits the code; if the account has 2FA it raises,
+        # and the wizard retries with a password — which goes straight to the password step
+        # (the code was already consumed by the first call, re-submitting it would fail).
+        if req.password:
             await client.sign_in(password=req.password)
+        else:
+            await client.sign_in(req.phone, req.code, phone_code_hash=req.phoneCodeHash)
+    except SessionPasswordNeededError:
+        raise HTTPException(status_code=409, detail="2FA password required")
     except PhoneCodeInvalidError:
         raise HTTPException(status_code=400, detail="invalid code")
 
@@ -158,7 +170,7 @@ async def sign_in(req: SignInReq, x_internal_token: str | None = Header(default=
 
 
 @app.post("/messages/send")
-async def send_message(req: SendMessageReq, x_internal_token: str | None = Header(default=None)):
+async def send_message(req: SendMessageReq, x_internal_token: Optional[str] = Header(default=None)):
     _check(x_internal_token)
     client = active.get(req.sessionId)
     if client is None:
@@ -167,8 +179,22 @@ async def send_message(req: SendMessageReq, x_internal_token: str | None = Heade
     return {"ok": True}
 
 
+@app.get("/sessions/{session_id}/dialogs")
+async def dialogs(session_id: str, x_internal_token: Optional[str] = Header(default=None)):
+    """Groups/supergroups the account belongs to (excludes DMs and broadcast channels)."""
+    _check(x_internal_token)
+    client = active.get(session_id)
+    if client is None:
+        raise HTTPException(status_code=404, detail="session not connected")
+    groups = []
+    async for d in client.iter_dialogs():
+        if d.is_group:
+            groups.append({"id": d.id, "title": d.title})
+    return {"dialogs": groups}
+
+
 @app.get("/sessions/{session_id}")
-async def session_status(session_id: str, x_internal_token: str | None = Header(default=None)):
+async def session_status(session_id: str, x_internal_token: Optional[str] = Header(default=None)):
     _check(x_internal_token)
     return {"sessionId": session_id, "status": "connected" if session_id in active else "offline"}
 

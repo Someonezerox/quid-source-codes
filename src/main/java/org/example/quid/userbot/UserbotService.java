@@ -12,14 +12,17 @@ import org.example.quid.conversation.enums.MessageRole;
 import org.example.quid.conversation.service.ConversationService;
 import org.example.quid.customer.entity.Customer;
 import org.example.quid.customer.service.CustomerService;
+import org.example.quid.exception.ResourceNotFoundException;
 import org.example.quid.notification.NotificationService;
 import org.example.quid.telegram.dto.TelegramUser;
+import org.example.quid.userbot.dto.UserbotDtos.GroupDto;
 import org.example.quid.userbot.dto.UserbotDtos.InboundRequest;
 import org.example.quid.userbot.dto.UserbotDtos.SignInRequest;
 import org.example.quid.workspace.entity.Workspace;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -62,12 +65,35 @@ public class UserbotService {
             log.warn("inbound for unknown/inactive session {}", req.sessionId());
             return null;
         }
+        // Always answer DMs; for group messages only the one chosen group is handled.
+        boolean isPrivate = Boolean.TRUE.equals(req.isPrivate());
+        if (!isPrivate) {
+            Long allowed = channel.getAllowedChatId();
+            if (allowed == null || !allowed.equals(req.chatId())) return null;
+        }
         TelegramUser from = new TelegramUser(req.senderId(), req.senderName(), null, null);
         Customer customer = customerService.findOrCreate(from, channel.getWorkspace());
-        Conversation conversation = conversationService.findOrCreateOpen(customer, channel);
+        Conversation conversation = conversationService.findOrCreateOpen(customer, channel, req.chatId());
         conversationService.addMessage(conversation, req.text(), MessageRole.CUSTOMER, null);
         notificationService.emit(channel.getWorkspace().getId(), "message",
                 Map.of("conversationId", conversation.getId(), "content", req.text(), "role", "CUSTOMER"));
         return conversation.getId();
+    }
+
+    /** Groups the userbot account can be pointed at. */
+    @Transactional(readOnly = true)
+    public List<GroupDto> listGroups(Long channelId, Workspace workspace) {
+        Channel channel = getOwnedChannel(channelId, workspace);
+        return userbotClient.listGroups(channel.getUserbotSessionId());
+    }
+
+    /** Point the userbot at a group (null = DMs only). */
+    public void setGroup(Long channelId, Long chatId, Workspace workspace) {
+        getOwnedChannel(channelId, workspace).setAllowedChatId(chatId);
+    }
+
+    private Channel getOwnedChannel(Long channelId, Workspace workspace) {
+        return channelRepository.findByIdAndWorkspace(channelId, workspace)
+                .orElseThrow(() -> new ResourceNotFoundException("Channel not found"));
     }
 }

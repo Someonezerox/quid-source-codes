@@ -1,19 +1,27 @@
 import { useMemo, useState } from 'react'
-import { Bot, CheckCircle2, MessageSquare, Search } from 'lucide-react'
+import { Bot, CheckCircle2, MessageSquare, Pencil, Search, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { PlusIcon } from '@/components/icons'
 import { StatCard } from '@/components/StatCard'
 import { Avatar } from '@/components/Avatar'
+import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useAgents } from './hooks'
+import { useAgents, useDeactivateAgent } from './hooks'
 import { toAgentRow, toAgentStats } from './adapters'
 import { AgentWizard } from './AgentWizard'
 
 export default function AgentsPage() {
   const { data: agents, isLoading } = useAgents()
+  const deactivate = useDeactivateAgent()
   const [search, setSearch] = useState('')
   const [addOpen, setAddOpen] = useState(false)
   const [editId, setEditId] = useState<number | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<{ id: number; name: string } | null>(null)
+
+  function confirmDelete() {
+    if (!pendingDelete) return
+    deactivate.mutate(pendingDelete.id, { onSettled: () => setPendingDelete(null) })
+  }
 
   const stats = useMemo(() => (agents ? toAgentStats(agents) : null), [agents])
   const rows = useMemo(
@@ -71,17 +79,17 @@ export default function AgentsPage() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-[2.2fr_1fr_1fr_1fr] gap-4 border-b-2 border-border px-5 py-3 text-[11px] font-bold uppercase tracking-[0.04em] text-text-3">
+              <div className="grid grid-cols-[2.2fr_1fr_1fr_1fr_84px] gap-4 border-b-2 border-border px-5 py-3 text-[11px] font-bold uppercase tracking-[0.04em] text-text-3">
                 <span>Agent</span>
                 <span>Status</span>
                 <span>Conversations</span>
                 <span>Avg confidence</span>
+                <span className="text-right">Actions</span>
               </div>
               {rows.map((a) => (
-                <button
+                <div
                   key={a.id}
-                  onClick={() => setEditId(a.id)}
-                  className="grid w-full grid-cols-[2.2fr_1fr_1fr_1fr] items-center gap-4 border-b border-border px-5 py-3.5 text-left transition-colors last:border-0 hover:bg-accent"
+                  className="grid w-full grid-cols-[2.2fr_1fr_1fr_1fr_84px] items-center gap-4 border-b border-border px-5 py-3.5 text-left transition-colors last:border-0 hover:bg-accent"
                 >
                   <div className="flex items-center gap-3">
                     <Avatar name={a.name} seed={a.avatarSeed} size={36} />
@@ -98,7 +106,25 @@ export default function AgentsPage() {
                   <span className="text-[13.5px] font-bold" style={{ color: a.confidenceColor }}>
                     {a.confidence}
                   </span>
-                </button>
+                  <div className="flex items-center justify-end gap-1.5">
+                    <button
+                      onClick={() => setEditId(a.id)}
+                      title="Edit"
+                      aria-label={`Edit ${a.name}`}
+                      className="grid size-8 place-items-center rounded-[8px] border border-border bg-raised text-text-3 transition-colors hover:text-foreground"
+                    >
+                      <Pencil size={14} />
+                    </button>
+                    <button
+                      onClick={() => setPendingDelete({ id: a.id, name: a.name })}
+                      title="Delete"
+                      aria-label={`Delete ${a.name}`}
+                      className="grid size-8 place-items-center rounded-[8px] border border-border bg-raised text-text-3 transition-colors hover:border-destructive hover:text-destructive"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
               ))}
             </>
           )}
@@ -107,6 +133,17 @@ export default function AgentsPage() {
 
       <AgentWizard open={addOpen} onOpenChange={setAddOpen} />
       <AgentWizard open={editId != null} onOpenChange={(o) => !o && setEditId(null)} agentId={editId ?? undefined} />
+
+      <ConfirmDialog
+        open={pendingDelete != null}
+        onOpenChange={(o) => !o && setPendingDelete(null)}
+        title={`Delete “${pendingDelete?.name ?? ''}”?`}
+        description="This agent will stop handling chats and be removed from your inbox routing. This can’t be undone."
+        confirmLabel="Delete agent"
+        destructive
+        loading={deactivate.isPending}
+        onConfirm={confirmDelete}
+      />
     </div>
   )
 }

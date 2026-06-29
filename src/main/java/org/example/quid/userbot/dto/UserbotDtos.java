@@ -23,6 +23,12 @@ public final class UserbotDtos {
             Long chatId,
             Long senderId,
             String senderName,
-            String text
+            String text,
+            Boolean isPrivate
     ) {}
+
+    /** A group/supergroup the userbot account is a member of. */
+    public record GroupDto(Long id, String title) {}
+
+    public record SetGroupRequest(Long chatId) {}
 }

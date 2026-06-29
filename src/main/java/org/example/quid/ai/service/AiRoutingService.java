@@ -15,9 +15,7 @@ import org.example.quid.conversation.repository.MessageRepository;
 import org.example.quid.conversation.service.ConversationService;
 import org.example.quid.customer.entity.Customer;
 import org.example.quid.customer.service.MemoryService;
-import org.example.quid.channel.enums.ChannelType;
 import org.example.quid.notification.NotificationService;
-import org.example.quid.telegram.client.TelegramBotClient;
 import org.example.quid.userbot.UserbotClient;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -38,7 +36,6 @@ public class AiRoutingService {
     private final ConversationService conversationService;
     private final RagService ragService;
     private final ChatClient chatClient;
-    private final TelegramBotClient telegramBotClient;
     private final UserbotClient userbotClient;
     private final MemoryService memoryService;
     private final NotificationService notificationService;
@@ -72,19 +69,15 @@ public class AiRoutingService {
 
             if (aiResponse.confidence() >= agent.getConfidenceThreshold()) {
                 conversationService.addMessage(conv, aiResponse.reply(), MessageRole.AI, null);
-                if (conv.getChannel().getType() == ChannelType.TELEGRAM_USERBOT) {
-                    userbotClient.send(
-                            conv.getChannel().getUserbotSessionId(),
-                            conv.getCustomer().getTelegramId(),
-                            aiResponse.reply()
-                    );
-                } else {
-                    telegramBotClient.sendMessage(
-                            conv.getChannel().getBotToken(),
-                            conv.getCustomer().getTelegramId(),
-                            aiResponse.reply()
-                    );
-                }
+                // reply into the originating chat (group id for groups, user id for DMs)
+                Long replyPeer = conv.getTelegramChatId() != null
+                        ? conv.getTelegramChatId()
+                        : conv.getCustomer().getTelegramId();
+                userbotClient.send(
+                        conv.getChannel().getUserbotSessionId(),
+                        replyPeer,
+                        aiResponse.reply()
+                );
             } else {
                 conv.setStatus(ConversationStatus.NEEDS_HUMAN);
                 log.info("Conversation {} routed to human (confidence={})", conversationId, aiResponse.confidence());

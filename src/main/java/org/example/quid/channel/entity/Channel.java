@@ -27,16 +27,14 @@ public class Channel {
     @Column(nullable = false)
     private ChannelType type;
 
-    /** Bot API token (TELEGRAM channels). Null for userbot channels. */
-    private String botToken;
-
     /** MTProto session id from the userbot sidecar (TELEGRAM_USERBOT channels). */
     private String userbotSessionId;
 
     /** Phone number backing a userbot channel. */
     private String phone;
 
-    private String webhookUrl;
+    /** Telegram group the userbot should respond in. Null = DMs only. The bot also always answers DMs. */
+    private Long allowedChatId;
 
     @Column(nullable = false)
     private boolean active = true;

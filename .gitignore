@@ -48,3 +48,6 @@ src/main/resources/application-dev.properties
 telegram-userbot/.venv/
 telegram-userbot/sessions/
 telegram-userbot/.env
+
+### Claude Code local settings (may capture secrets from shell commands) ###
+.claude/settings.local.json

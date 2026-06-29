@@ -8,8 +8,8 @@ public record ChannelResponse(
         Long id,
         String name,
         ChannelType type,
-        String webhookUrl,
         boolean active,
         Long assignedAgentId,
+        Long allowedChatId,
         Instant createdAt
 ) {}
