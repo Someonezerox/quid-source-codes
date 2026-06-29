@@ -48,8 +48,15 @@ export async function getLearning(id: number): Promise<AgentLearningResponse> {
 
 // --- Knowledge (Agent → KnowledgeBase → entries) ---
 
-export async function createKnowledgeBase(agentId: number, name: string) {
+export async function createKnowledgeBase(agentId: number, name: string): Promise<{ id: number; name: string }> {
   const { data } = await api.post('/knowledge/bases', { agentId, name })
+  return data
+}
+
+export async function uploadKnowledgeDoc(kbId: number, file: File): Promise<KnowledgeEntryResponse[]> {
+  const fd = new FormData()
+  fd.append('file', file)
+  const { data } = await api.post<KnowledgeEntryResponse[]>(`/knowledge/bases/${kbId}/upload`, fd)
   return data
 }
 

@@ -9,8 +9,10 @@ import org.example.quid.knowledge.dto.KnowledgeEntryResponse;
 import org.example.quid.knowledge.service.KnowledgeService;
 import org.example.quid.user.entity.User;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -46,6 +48,14 @@ public class KnowledgeController {
                                               @Valid @RequestBody KnowledgeEntryRequest request,
                                               @AuthenticationPrincipal User user) {
         return knowledgeService.createEntry(kbId, request, user.getWorkspace());
+    }
+
+    @PostMapping(value = "/bases/{kbId}/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public List<KnowledgeEntryResponse> upload(@PathVariable Long kbId,
+                                               @RequestParam("file") MultipartFile file,
+                                               @AuthenticationPrincipal User user) {
+        return knowledgeService.uploadDocument(kbId, file, user.getWorkspace());
     }
 
     @GetMapping("/bases/{kbId}/entries")

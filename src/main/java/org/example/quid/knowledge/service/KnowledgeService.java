@@ -21,6 +21,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -63,6 +64,25 @@ public class KnowledgeService {
         KnowledgeEntry saved = entryRepository.save(knowledgeMapper.toEntryEntity(request, kb));
         embedAsync(saved.getId(), request.title() + "\n" + request.content());
         return knowledgeMapper.toEntryResponse(saved, false);
+    }
+
+    /** Upload a document: extract text → chunk → one embedded entry per chunk. */
+    public List<KnowledgeEntryResponse> uploadDocument(Long kbId, MultipartFile file, Workspace workspace) {
+        KnowledgeBase kb = getKbOrThrow(kbId, workspace);
+        String filename = file.getOriginalFilename() == null ? "document" : file.getOriginalFilename();
+        List<String> chunks = DocumentParser.chunk(DocumentParser.extractText(file));
+        if (chunks.isEmpty()) {
+            throw new IllegalArgumentException("No readable text found in the file.");
+        }
+        List<KnowledgeEntryResponse> created = new java.util.ArrayList<>();
+        for (int i = 0; i < chunks.size(); i++) {
+            String title = chunks.size() == 1 ? filename : filename + " — part " + (i + 1);
+            KnowledgeEntryRequest req = new KnowledgeEntryRequest(title, chunks.get(i));
+            KnowledgeEntry saved = entryRepository.save(knowledgeMapper.toEntryEntity(req, kb));
+            embedAsync(saved.getId(), title + "\n" + chunks.get(i));
+            created.add(knowledgeMapper.toEntryResponse(saved, false));
+        }
+        return created;
     }
 
     @Transactional(readOnly = true)

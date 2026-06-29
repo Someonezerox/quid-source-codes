@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, Check, ChevronDown, Send, Shield, Upload } from 'lucide-react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { assignAgentToChannel } from '@/api/agentsApi'
+import { assignAgentToChannel, createKnowledgeBase, uploadKnowledgeDoc } from '@/api/agentsApi'
 import { useAgent, useChannels, useCreateAgent, useUpdateAgent } from './hooks'
 import type { ChannelResponse } from '@/types/agents'
 
@@ -143,6 +143,8 @@ export function AgentWizard({ open, onOpenChange, agentId }: Props) {
               channels={channels ?? []}
               channelId={channelId}
               setChannelId={setChannelId}
+              agentId={agentId}
+              initialKbId={detail?.knowledgeBases[0]?.id}
             />
           )}
           {error && <p className="text-[12.5px] font-semibold text-destructive">{error}</p>}
@@ -252,9 +254,11 @@ interface ConfigProps {
   channels: ChannelResponse[]
   channelId: number | null
   setChannelId: (v: number | null) => void
+  agentId?: number
+  initialKbId?: number
 }
 
-function StepConfig({ name, setName, handle, setHandle, model, setModel, persona, setPersona, ks, setKs, channels, channelId, setChannelId }: ConfigProps) {
+function StepConfig({ name, setName, handle, setHandle, model, setModel, persona, setPersona, ks, setKs, channels, channelId, setChannelId, agentId, initialKbId }: ConfigProps) {
   const models: { id: Model; label: string }[] = [
     { id: 'gpt', label: 'GPT-4o' },
     { id: 'claude', label: 'Claude 3.5' },
@@ -326,13 +330,7 @@ function StepConfig({ name, setName, handle, setHandle, model, setModel, persona
             )
           })}
         </div>
-        <div className="flex cursor-pointer flex-col items-center gap-2 rounded-[11px] border border-dashed border-border bg-raised p-5 text-center">
-          <div className="grid size-9 place-items-center rounded-[10px] border border-border bg-card text-muted-foreground">
-            <Upload size={18} />
-          </div>
-          <div className="text-[13px] font-semibold">Click to upload or drag & drop</div>
-          <div className="text-[12px] text-text-3">PDF, DOCX, TXT, or CSV · max 10 MB</div>
-        </div>
+        <UploadDropzone agentId={agentId} initialKbId={initialKbId} />
       </div>
       <div>
         <label className={labelCls}>Assign to channel</label>
@@ -350,6 +348,72 @@ function StepConfig({ name, setName, handle, setHandle, model, setModel, persona
         </select>
         {channels.length === 0 && <p className="mt-1.5 text-[11.5px] text-text-3">No channels yet — add one in Integrations.</p>}
       </div>
+    </div>
+  )
+}
+
+type UploadState = { status: 'idle' | 'busy' | 'done' | 'error'; message?: string }
+
+/** Functional knowledge upload: ensures a KB exists for the agent, then posts the file. */
+function UploadDropzone({ agentId, initialKbId }: { agentId?: number; initialKbId?: number }) {
+  const [kbId, setKbId] = useState<number | undefined>(initialKbId)
+  const [state, setState] = useState<UploadState>({ status: 'idle' })
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // upload is only possible once the agent (and thus a KB) exists
+  if (agentId == null) {
+    return (
+      <div className="flex flex-col items-center gap-2 rounded-[11px] border border-dashed border-border bg-raised p-5 text-center opacity-70">
+        <div className="grid size-9 place-items-center rounded-[10px] border border-border bg-card text-muted-foreground">
+          <Upload size={18} />
+        </div>
+        <div className="text-[13px] font-semibold">Upload available after creating the agent</div>
+        <div className="text-[12px] text-text-3">Create the agent, then reopen it to add documents.</div>
+      </div>
+    )
+  }
+
+  async function onFile(file: File) {
+    setState({ status: 'busy', message: `Uploading ${file.name}…` })
+    try {
+      let id = kbId
+      if (id == null) {
+        id = (await createKnowledgeBase(agentId as number, 'Knowledge Base')).id
+        setKbId(id)
+      }
+      const entries = await uploadKnowledgeDoc(id, file)
+      setState({ status: 'done', message: `Added ${entries.length} chunk${entries.length === 1 ? '' : 's'} from ${file.name}` })
+    } catch {
+      setState({ status: 'error', message: 'Upload failed. Supported: PDF, TXT, CSV, MD (max 10 MB).' })
+    }
+  }
+
+  return (
+    <div
+      onClick={() => inputRef.current?.click()}
+      className="flex cursor-pointer flex-col items-center gap-2 rounded-[11px] border border-dashed border-border bg-raised p-5 text-center hover:border-primary"
+    >
+      <input
+        ref={inputRef}
+        type="file"
+        accept=".pdf,.txt,.csv,.md"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0]
+          if (f) void onFile(f)
+          e.target.value = ''
+        }}
+      />
+      <div className="grid size-9 place-items-center rounded-[10px] border border-border bg-card text-muted-foreground">
+        <Upload size={18} />
+      </div>
+      {state.status === 'idle' && <div className="text-[13px] font-semibold">Click to upload or drag & drop</div>}
+      {state.status !== 'idle' && (
+        <div className={cn('text-[13px] font-semibold', state.status === 'error' ? 'text-destructive' : state.status === 'done' ? 'text-status-resolved' : 'text-foreground')}>
+          {state.message}
+        </div>
+      )}
+      <div className="text-[12px] text-text-3">PDF, TXT, CSV, or MD · max 10 MB</div>
     </div>
   )
 }

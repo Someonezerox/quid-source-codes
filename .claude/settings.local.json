@@ -72,7 +72,8 @@
       "Bash(python3 -c \"import sys,json;[print\\(' -',a['name'],'| active',a['active'],'| conv',a['totalConversations']\\) for a in json.load\\(sys.stdin\\)]\")",
       "Bash(python3 -c \"import sys,json;d=json.load\\(sys.stdin\\);print\\('  persisted model =>', d.get\\('model'\\)\\)\")",
       "Bash(python3 -c \"import sys,json;[print\\(' ',a['id'],a['name'],'model=',a['model']\\) for a in json.load\\(sys.stdin\\)]\")",
-      "Bash(python3 -c \"import sys,json;d=json.load\\(sys.stdin\\);print\\('  ',[c['name'] for c in d['assignedChannels']]\\)\")"
+      "Bash(python3 -c \"import sys,json;d=json.load\\(sys.stdin\\);print\\('  ',[c['name'] for c in d['assignedChannels']]\\)\")",
+      "Bash(python3 -c \"import sys,json;[print\\('  -',e['title']\\) for e in json.load\\(sys.stdin\\)]\")"
     ]
   }
 }
