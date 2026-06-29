@@ -67,7 +67,8 @@
       "Bash(psql -d quid -t -c \"SELECT 'users', count\\(*\\) FROM users UNION ALL SELECT 'workspaces', count\\(*\\) FROM workspaces UNION ALL SELECT 'conversations', count\\(*\\) FROM conversations UNION ALL SELECT 'messages', count\\(*\\) FROM messages UNION ALL SELECT 'agents', count\\(*\\) FROM agents UNION ALL SELECT 'customers', count\\(*\\) FROM customers;\")",
       "Bash(psql -d quid -c \"DROP SCHEMA public CASCADE; CREATE SCHEMA public;\")",
       "Bash(break)",
-      "Bash(psql -d quid -t -c \"SELECT column_name FROM information_schema.columns WHERE table_name='users' ORDER BY 1;\")"
+      "Bash(psql -d quid -t -c \"SELECT column_name FROM information_schema.columns WHERE table_name='users' ORDER BY 1;\")",
+      "Bash(npx --yes shadcn@latest add dialog input textarea label slider dropdown-menu -y)"
     ]
   }
 }
