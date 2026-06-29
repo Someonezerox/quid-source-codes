@@ -4,6 +4,7 @@ import type {
   AgentLearningResponse,
   AgentRequest,
   AgentResponse,
+  ChannelResponse,
   KnowledgeEntryResponse,
 } from '@/types/agents'
 
@@ -29,6 +30,15 @@ export async function updateAgent(id: number, body: AgentRequest): Promise<Agent
 
 export async function deactivateAgent(id: number): Promise<void> {
   await api.delete(`/agents/${id}`)
+}
+
+export async function listChannels(): Promise<ChannelResponse[]> {
+  const { data } = await api.get<ChannelResponse[]>('/channels')
+  return data
+}
+
+export async function assignAgentToChannel(agentId: number, channelId: number): Promise<void> {
+  await api.put(`/agents/${agentId}/channels/${channelId}`)
 }
 
 export async function getLearning(id: number): Promise<AgentLearningResponse> {

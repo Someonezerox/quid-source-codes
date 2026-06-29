@@ -63,7 +63,7 @@ public class AiRoutingService {
             String memoryContext = memoryService.buildContext(conv.getCustomer());
             String context = combineContexts(memoryContext, ragContext);
 
-            AiResponse aiResponse = chatClient.chat(agent.getSystemPrompt(), context, window);
+            AiResponse aiResponse = chatClient.chat(agent.getSystemPrompt(), context, window, agent.getModel());
             conv.setConfidenceScore(aiResponse.confidence());
             conv.setAiAgent(agent);
 

@@ -4,6 +4,7 @@ export interface AgentResponse {
   id: number
   name: string
   description: string | null
+  model: string | null
   confidenceThreshold: number
   active: boolean
   createdAt: string
@@ -15,6 +16,7 @@ export interface AgentRequest {
   name: string
   description?: string
   systemPrompt: string
+  model?: string
   confidenceThreshold: number
 }
 
@@ -36,7 +38,10 @@ export interface ChannelResponse {
   id: number
   name: string
   type: string
+  webhookUrl: string | null
   active: boolean
+  assignedAgentId: number | null
+  createdAt: string
 }
 
 export interface AgentDetailResponse {

@@ -27,6 +27,10 @@ public class Agent {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String systemPrompt;
 
+    /** OpenRouter model id; null falls back to the workspace default (ai.chat-model). */
+    @Column
+    private String model;
+
     @Column(nullable = false)
     private double confidenceThreshold = 0.75;
 

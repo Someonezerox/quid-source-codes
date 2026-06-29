@@ -20,6 +20,7 @@ public class AgentMapper {
                 agent.getId(),
                 agent.getName(),
                 agent.getDescription(),
+                agent.getModel(),
                 agent.getConfidenceThreshold(),
                 agent.isActive(),
                 agent.getCreatedAt(),
@@ -48,6 +49,7 @@ public class AgentMapper {
         agent.setName(request.name());
         agent.setDescription(request.description());
         agent.setSystemPrompt(request.systemPrompt());
+        agent.setModel(request.model());
         if (request.confidenceThreshold() != null) {
             agent.setConfidenceThreshold(request.confidenceThreshold());
         }

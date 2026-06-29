@@ -6,6 +6,7 @@ public record AgentResponse(
         Long id,
         String name,
         String description,
+        String model,
         double confidenceThreshold,
         boolean active,
         Instant createdAt,

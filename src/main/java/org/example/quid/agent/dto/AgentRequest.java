@@ -8,5 +8,6 @@ public record AgentRequest(
         @NotBlank String name,
         String description,
         @NotBlank String systemPrompt,
+        String model,
         @DecimalMin("0.0") @DecimalMax("1.0") Double confidenceThreshold
 ) {}

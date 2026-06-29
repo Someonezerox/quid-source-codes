@@ -3,9 +3,23 @@ import { ArrowLeft, ArrowRight, Check, ChevronDown, Send, Shield, Upload } from 
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { useAgent, useCreateAgent, useUpdateAgent } from './hooks'
+import { assignAgentToChannel } from '@/api/agentsApi'
+import { useAgent, useChannels, useCreateAgent, useUpdateAgent } from './hooks'
+import type { ChannelResponse } from '@/types/agents'
 
 type Model = 'gpt' | 'claude' | 'llama'
+
+// Picker option → OpenRouter model id (what the backend stores / calls).
+const MODEL_IDS: Record<Model, string> = {
+  gpt: 'openai/gpt-4o',
+  claude: 'anthropic/claude-3.5-sonnet',
+  llama: 'meta-llama/llama-3.1-70b-instruct',
+}
+
+function modelToLocal(id: string | null): Model {
+  const match = (Object.keys(MODEL_IDS) as Model[]).find((k) => MODEL_IDS[k] === id)
+  return match ?? 'gpt'
+}
 
 interface Props {
   open: boolean
@@ -24,6 +38,7 @@ const STEP_META: Record<number, { title: string; desc: string }> = {
 export function AgentWizard({ open, onOpenChange, agentId }: Props) {
   const editing = agentId != null
   const { data: detail } = useAgent(agentId ?? 0, editing && open)
+  const { data: channels } = useChannels()
   const create = useCreateAgent()
   const update = useUpdateAgent(agentId ?? 0)
 
@@ -32,6 +47,7 @@ export function AgentWizard({ open, onOpenChange, agentId }: Props) {
   const [handle, setHandle] = useState('')
   const [model, setModel] = useState<Model>('gpt')
   const [persona, setPersona] = useState('')
+  const [channelId, setChannelId] = useState<number | null>(null)
   const [ks, setKs] = useState({ products: true, faq: true, orders: false })
   const [error, setError] = useState<string | null>(null)
 
@@ -44,10 +60,13 @@ export function AgentWizard({ open, onOpenChange, agentId }: Props) {
       setName(detail.agent.name)
       setHandle(detail.agent.description ?? '')
       setPersona(detail.systemPrompt)
+      setModel(modelToLocal(detail.agent.model))
+      setChannelId(detail.assignedChannels[0]?.id ?? null)
     } else if (!editing) {
       setName('')
       setHandle('')
       setPersona('')
+      setChannelId(null)
     }
   }, [open, editing, detail])
 
@@ -59,11 +78,12 @@ export function AgentWizard({ open, onOpenChange, agentId }: Props) {
       name,
       description: handle || undefined,
       systemPrompt: persona,
+      model: MODEL_IDS[model],
       confidenceThreshold: editing ? (detail?.agent.confidenceThreshold ?? 0.7) : 0.7,
     }
     try {
-      if (editing) await update.mutateAsync(body)
-      else await create.mutateAsync(body)
+      const saved = editing ? await update.mutateAsync(body) : await create.mutateAsync(body)
+      if (channelId != null) await assignAgentToChannel(saved.id, channelId)
       onOpenChange(false)
     } catch {
       setError('Could not save the agent. Check the name and persona, then try again.')
@@ -120,6 +140,9 @@ export function AgentWizard({ open, onOpenChange, agentId }: Props) {
               setPersona={setPersona}
               ks={ks}
               setKs={setKs}
+              channels={channels ?? []}
+              channelId={channelId}
+              setChannelId={setChannelId}
             />
           )}
           {error && <p className="text-[12.5px] font-semibold text-destructive">{error}</p>}
@@ -226,9 +249,12 @@ interface ConfigProps {
   setPersona: (v: string) => void
   ks: { products: boolean; faq: boolean; orders: boolean }
   setKs: (v: { products: boolean; faq: boolean; orders: boolean }) => void
+  channels: ChannelResponse[]
+  channelId: number | null
+  setChannelId: (v: number | null) => void
 }
 
-function StepConfig({ name, setName, handle, setHandle, model, setModel, persona, setPersona, ks, setKs }: ConfigProps) {
+function StepConfig({ name, setName, handle, setHandle, model, setModel, persona, setPersona, ks, setKs, channels, channelId, setChannelId }: ConfigProps) {
   const models: { id: Model; label: string }[] = [
     { id: 'gpt', label: 'GPT-4o' },
     { id: 'claude', label: 'Claude 3.5' },
@@ -307,6 +333,22 @@ function StepConfig({ name, setName, handle, setHandle, model, setModel, persona
           <div className="text-[13px] font-semibold">Click to upload or drag & drop</div>
           <div className="text-[12px] text-text-3">PDF, DOCX, TXT, or CSV · max 10 MB</div>
         </div>
+      </div>
+      <div>
+        <label className={labelCls}>Assign to channel</label>
+        <select
+          className={cn(inputCls, 'cursor-pointer')}
+          value={channelId ?? ''}
+          onChange={(e) => setChannelId(e.target.value ? Number(e.target.value) : null)}
+        >
+          <option value="">Not assigned</option>
+          {channels.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name} · {c.type}
+            </option>
+          ))}
+        </select>
+        {channels.length === 0 && <p className="mt-1.5 text-[11.5px] text-text-3">No channels yet — add one in Integrations.</p>}
       </div>
     </div>
   )

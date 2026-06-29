@@ -8,6 +8,7 @@ import {
   getAgent,
   getLearning,
   listAgents,
+  listChannels,
   listEntries,
   updateAgent,
 } from '@/api/agentsApi'
@@ -15,6 +16,10 @@ import type { AgentRequest } from '@/types/agents'
 
 export function useAgents() {
   return useQuery({ queryKey: ['agents'], queryFn: listAgents })
+}
+
+export function useChannels() {
+  return useQuery({ queryKey: ['channels'], queryFn: listChannels, staleTime: 60_000 })
 }
 
 export function useAgent(id: number, enabled = true) {

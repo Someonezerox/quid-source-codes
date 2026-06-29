@@ -49,7 +49,7 @@ public class ChatClient {
                 .build();
     }
 
-    public AiResponse chat(String agentPersona, String knowledgeContext, List<Message> history) {
+    public AiResponse chat(String agentPersona, String knowledgeContext, List<Message> history, String model) {
         String systemPrompt = agentPersona + PROMPT_SUFFIX.formatted(
                 knowledgeContext.isBlank() ? "No specific knowledge provided." : knowledgeContext);
 
@@ -59,10 +59,11 @@ public class ChatClient {
                 .map(m -> new ChatMsg(toRole(m.getRole()), m.getContent()))
                 .forEach(messages::add);
 
+        String chatModel = (model == null || model.isBlank()) ? props.chatModel() : model;
         try {
             var response = http.post()
                     .uri("/chat/completions")
-                    .body(new Request(props.chatModel(), messages))
+                    .body(new Request(chatModel, messages))
                     .retrieve()
                     .body(Response.class);
 
