@@ -17,8 +17,8 @@ export function useAgents() {
   return useQuery({ queryKey: ['agents'], queryFn: listAgents })
 }
 
-export function useAgent(id: number) {
-  return useQuery({ queryKey: ['agents', id], queryFn: () => getAgent(id) })
+export function useAgent(id: number, enabled = true) {
+  return useQuery({ queryKey: ['agents', id], queryFn: () => getAgent(id), enabled: enabled && id > 0 })
 }
 
 export function useAgentLearning(id: number) {

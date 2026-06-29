@@ -23,7 +23,7 @@ const STEP_META: Record<number, { title: string; desc: string }> = {
 
 export function AgentWizard({ open, onOpenChange, agentId }: Props) {
   const editing = agentId != null
-  const { data: detail } = useAgent(agentId ?? 0)
+  const { data: detail } = useAgent(agentId ?? 0, editing && open)
   const create = useCreateAgent()
   const update = useUpdateAgent(agentId ?? 0)
 

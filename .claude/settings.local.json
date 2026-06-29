@@ -68,7 +68,8 @@
       "Bash(psql -d quid -c \"DROP SCHEMA public CASCADE; CREATE SCHEMA public;\")",
       "Bash(break)",
       "Bash(psql -d quid -t -c \"SELECT column_name FROM information_schema.columns WHERE table_name='users' ORDER BY 1;\")",
-      "Bash(npx --yes shadcn@latest add dialog input textarea label slider dropdown-menu -y)"
+      "Bash(npx --yes shadcn@latest add dialog input textarea label slider dropdown-menu -y)",
+      "Bash(python3 -c \"import sys,json;[print\\(' -',a['name'],'| active',a['active'],'| conv',a['totalConversations']\\) for a in json.load\\(sys.stdin\\)]\")"
     ]
   }
 }
