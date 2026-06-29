@@ -43,3 +43,8 @@ out/
 
 ### Local dev config (contains DB credentials) ###
 src/main/resources/application-dev.properties
+
+### Telegram userbot sidecar ###
+telegram-userbot/.venv/
+telegram-userbot/sessions/
+telegram-userbot/.env
