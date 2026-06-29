@@ -19,4 +19,7 @@ public interface ChannelRepository extends JpaRepository<Channel, Long> {
     Optional<Channel> findByBotToken(String botToken);
     boolean existsByBotTokenAndWorkspace(String botToken, Workspace workspace);
     List<Channel> findAllByAssignedAgent(Agent agent);
+
+    @EntityGraph(attributePaths = {"assignedAgent"})
+    Optional<Channel> findByUserbotSessionId(String userbotSessionId);
 }

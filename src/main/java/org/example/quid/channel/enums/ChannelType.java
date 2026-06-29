@@ -1,5 +1,6 @@
 package org.example.quid.channel.enums;
 
 public enum ChannelType {
-    TELEGRAM
+    TELEGRAM,
+    TELEGRAM_USERBOT
 }

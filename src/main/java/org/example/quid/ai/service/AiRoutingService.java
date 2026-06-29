@@ -15,8 +15,10 @@ import org.example.quid.conversation.repository.MessageRepository;
 import org.example.quid.conversation.service.ConversationService;
 import org.example.quid.customer.entity.Customer;
 import org.example.quid.customer.service.MemoryService;
+import org.example.quid.channel.enums.ChannelType;
 import org.example.quid.notification.NotificationService;
 import org.example.quid.telegram.client.TelegramBotClient;
+import org.example.quid.userbot.UserbotClient;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +39,7 @@ public class AiRoutingService {
     private final RagService ragService;
     private final ChatClient chatClient;
     private final TelegramBotClient telegramBotClient;
+    private final UserbotClient userbotClient;
     private final MemoryService memoryService;
     private final NotificationService notificationService;
     private final AiProperties props;
@@ -69,11 +72,19 @@ public class AiRoutingService {
 
             if (aiResponse.confidence() >= agent.getConfidenceThreshold()) {
                 conversationService.addMessage(conv, aiResponse.reply(), MessageRole.AI, null);
-                telegramBotClient.sendMessage(
-                        conv.getChannel().getBotToken(),
-                        conv.getCustomer().getTelegramId(),
-                        aiResponse.reply()
-                );
+                if (conv.getChannel().getType() == ChannelType.TELEGRAM_USERBOT) {
+                    userbotClient.send(
+                            conv.getChannel().getUserbotSessionId(),
+                            conv.getCustomer().getTelegramId(),
+                            aiResponse.reply()
+                    );
+                } else {
+                    telegramBotClient.sendMessage(
+                            conv.getChannel().getBotToken(),
+                            conv.getCustomer().getTelegramId(),
+                            aiResponse.reply()
+                    );
+                }
             } else {
                 conv.setStatus(ConversationStatus.NEEDS_HUMAN);
                 log.info("Conversation {} routed to human (confidence={})", conversationId, aiResponse.confidence());

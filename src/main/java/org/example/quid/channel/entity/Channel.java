@@ -27,8 +27,14 @@ public class Channel {
     @Column(nullable = false)
     private ChannelType type;
 
-    @Column(nullable = false)
+    /** Bot API token (TELEGRAM channels). Null for userbot channels. */
     private String botToken;
+
+    /** MTProto session id from the userbot sidecar (TELEGRAM_USERBOT channels). */
+    private String userbotSessionId;
+
+    /** Phone number backing a userbot channel. */
+    private String phone;
 
     private String webhookUrl;
 
