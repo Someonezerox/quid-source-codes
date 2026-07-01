@@ -273,11 +273,11 @@ export function LandingPage() {
               { step: '03', title: 'Go live', description: 'Activate the channel. AI handles the easy questions; your team gets only the hard ones.' },
             ].map((item, i) => (
               <FadeUp key={item.step} delay={i * 100}>
-                <div className="relative flex flex-col gap-3 rounded-[20px] border border-border bg-canvas p-6">
-                  <span className="text-[42px] font-extrabold leading-none tracking-tight" style={{ color: 'var(--primary)', opacity: 0.25 }}>
+                <div className="group relative flex flex-col gap-3 rounded-[20px] bg-canvas p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_45px_-5px_color-mix(in_srgb,var(--primary)_35%,transparent)]">
+                  <span className="text-[42px] font-extrabold leading-none tracking-tight text-text-3/50 transition-colors duration-300 group-hover:text-primary">
                     {item.step}
                   </span>
-                  <h3 className="text-[16px] font-bold">{item.title}</h3>
+                  <h3 className="text-[16px] font-bold transition-colors duration-300 group-hover:text-foreground">{item.title}</h3>
                   <p className="text-[13.5px] leading-relaxed text-muted-foreground">{item.description}</p>
                 </div>
               </FadeUp>
