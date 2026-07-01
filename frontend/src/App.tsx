@@ -5,6 +5,7 @@ import { ProtectedRoute } from '@/router/ProtectedRoute'
 import { RoleGuard } from '@/router/RoleGuard'
 import { Placeholder } from '@/pages/Placeholder'
 import { Styleguide } from '@/pages/Styleguide'
+import { LandingPage } from '@/pages/LandingPage'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { useAuthBootstrap } from '@/features/auth/session'
 import { useApplyTheme } from '@/store/uiStore'
@@ -17,11 +18,11 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
 
         <Route element={<ProtectedRoute />}>
           <Route element={<AppShell />}>
-            <Route index element={<Navigate to="/inbox" replace />} />
             <Route path="/dashboard" element={<Placeholder title="Dashboard" milestone="F4" />} />
             <Route path="/inbox" element={<Placeholder title="Inbox" milestone="F5" />} />
             <Route path="/products" element={<Placeholder title="Products" milestone="F9" />} />
@@ -37,7 +38,7 @@ function App() {
           </Route>
         </Route>
 
-        <Route path="*" element={<Navigate to="/inbox" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   )
